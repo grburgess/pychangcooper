@@ -1,9 +1,4 @@
-import os
-
-
-from numpy.distutils.core import setup, find_data_files
-from numpy.distutils.core import Extension
-
+from setuptools import setup, find_packages
 
 setup(
 

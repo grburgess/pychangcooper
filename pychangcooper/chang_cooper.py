@@ -1,5 +1,7 @@
 import numpy as np
 
+
+
 class ChangCooper(object):
     def __init__(self, n_grid_points=300, max_grid=1E5, store_progress=False):
         """
@@ -211,6 +213,8 @@ class ChangCooper(object):
                     self._d[i] - self._a[i] * self._dprime[i - 1]) / (
                         self._b[i] - self._a[i] * self._cprime[i - 1])
 
+
+
     def back_substitution(self):
         """
         This is the backwards substitution step of the tridiagonal
@@ -219,16 +223,18 @@ class ChangCooper(object):
 
 
         
-        new_d = np.zeros(self._n_grid_points)
+        n_j_plus_1 = np.zeros(self._n_grid_points)
 
         # set the end points
         n_j_plus_1[-1] = self._dprime[-1]
 
         # backwards step to the beginning
+
         for j in xrange(self._n_grid_points - 2, -1, -1):
 
             n_j_plus_1[j] = self._dprime[j] - self._cprime[j] * n_j_plus_1[j + 1]
 
+                
         # set the new solution to the current one
 
         if self._store_progress:

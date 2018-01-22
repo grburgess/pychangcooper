@@ -1,5 +1,7 @@
-from pychangcooper import ChangCooper
+import numpy as np
 
+from pychangcooper import ChangCooper
+from pychangcooper.utils.progress_bar import progress_bar
 
 class SynchrotronCooling(ChangCooper):
     def __init__(self,
@@ -59,11 +61,15 @@ class SynchrotronCooling(ChangCooper):
 
     def run(self):
 
-        for i in xrange(int(self._steps)):
 
-            self.forward_sweep()
-            self.back_substitution()
+        with progress_bar(int(self._steps), title = 'cooling electrons') as p:
+            for i in xrange(int(self._steps)):
 
+                self.forward_sweep()
+                self.back_substitution()
+
+                p.increase()
+                
     def _clean(self):
 
         lower_bound = min(self._gamma_cool, self._gamma_injection)
