@@ -3,6 +3,7 @@ import numpy as np
 from pychangcooper import ChangCooper
 from pychangcooper.utils.progress_bar import progress_bar
 
+
 class SynchrotronCooling(ChangCooper):
     def __init__(self,
                  B=10.,
@@ -11,6 +12,7 @@ class SynchrotronCooling(ChangCooper):
                  gamma_max=1E5,
                  n_grid_points=300,
                  max_gamma=1E5,
+                 initial_distribution = None,
                  store_progress=False):
 
         #     Define a factor that is dependent on the magnetic field B.
@@ -35,10 +37,11 @@ class SynchrotronCooling(ChangCooper):
 
         self._cool = 1.29234E-9 * B * B
 
-        self._delta_t = sync_cool / (gamma_max)
+        delta_t = sync_cool / (gamma_max)
 
-        super(SynchrotronCooling, self).__init__(n_grid_points, max_gamma,
-                                                 store_progress)
+        super(SynchrotronCooling,
+              self).__init__(n_grid_points, max_gamma, delta_t,
+                             initial_distribution, store_progress)
 
     def _define_terms(self):
 
@@ -61,15 +64,14 @@ class SynchrotronCooling(ChangCooper):
 
     def run(self):
 
-
-        with progress_bar(int(self._steps), title = 'cooling electrons') as p:
+        with progress_bar(int(self._steps), title='cooling electrons') as p:
             for i in xrange(int(self._steps)):
 
                 self.forward_sweep()
                 self.back_substitution()
 
                 p.increase()
-                
+
     def _clean(self):
 
         lower_bound = min(self._gamma_cool, self._gamma_injection)

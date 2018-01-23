@@ -2,7 +2,7 @@ import numpy as np
 
 
 class ChangCooper(object):
-    def __init__(self, n_grid_points=300, max_grid=1E5, delta_t=1., store_progress=False):
+    def __init__(self, n_grid_points=300, max_grid=1E5, delta_t=1., initial_distribution=None, store_progress=False):
         """
         Generic Chang and Cooper base class. Currently, the dispersion and heating terms 
         are assumed to be time-independent
@@ -22,6 +22,18 @@ class ChangCooper(object):
         # first build the grid which is independent of the scheme
         self._build_grid()
 
+        if initial_distribution is None:
+
+            # initalize the grid of electrons
+            self._n_current = np.zeros(self._n_grid_points)
+
+        else:
+
+            assert len(initial_distribution) == self._n_grid_points
+
+        
+
+        
         # define the heating and dispersion terms
         # must be implemented in the subclasses
         self._define_terms()
@@ -53,9 +65,7 @@ class ChangCooper(object):
         self._half_grid = np.zeros(self._n_grid_points)
         self._half_grid2 = np.zeros(self._n_grid_points)
 
-        # initalize the grid of electrons
-        self._n_current = np.zeros(self._n_grid_points)
-
+        
         # now build the grid and the half grid points
         # we also make squared terms just incase
         for i in range(self._n_grid_points):
