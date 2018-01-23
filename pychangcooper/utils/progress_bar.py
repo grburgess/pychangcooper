@@ -144,49 +144,6 @@ def progress_bar(iterations, width=None, scale=1, units='', title=None):
 
     this_progress_bar.finish()
 
-
-@contextmanager
-def multiple_progress_bars(iterations, n, width=None, force_html=False):
-    # Instance n identical progress bars
-
-    if has_widgets and is_inside_notebook():
-
-        if width is None:
-            width = 50
-
-        try:
-
-            # Default is the HTML bar, which only works within a notebook
-
-            this_progress_bars = [ProgressBarHTML(iterations, width) for i in range(n)]
-
-        except:
-
-            if force_html:
-                raise CannotGenerateHTMLBar("force_html was set to True, but I couldn't generate an HTML bar")
-
-            # Running in a terminal. Fall back to the ascii bar
-
-            this_progress_bars = [ProgressBarAscii(iterations, width) for i in range(n)]
-
-    else:
-
-        if width is None:
-            width = 30
-
-        if force_html:
-            raise CannotGenerateHTMLBar("force_html was set to True, but I couldn't generate an HTML bar")
-
-        # No widgets, use Ascii bars
-
-        this_progress_bars = [ProgressBarAscii(iterations, width) for i in range(n)]
-
-    yield this_progress_bars
-
-    for this_progress_bar in this_progress_bars:
-        this_progress_bar.finish()
-
-
 class ProgressBarBase(object):
     def __init__(self, iterations, width, scale=1, units='', title=None):
 
