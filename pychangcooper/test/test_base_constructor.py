@@ -54,6 +54,7 @@ def test_chang_cooper_constructor():
     
     assert dummy.history == []
 
+    assert dummy._a_non_zero
     # now with no dispersion
 
     
@@ -61,6 +62,7 @@ def test_chang_cooper_constructor():
 
     assert np.all(dummy.delta_j == 0)
 
+    assert not dummy._a_non_zero
 
 def test_history():
 
