@@ -58,7 +58,7 @@ class ChangCooper(object):
 
         # now build the grid and the half grid points
         # we also make squared terms just incase
-        for i in xrange(self._n_grid_points):
+        for i in range(self._n_grid_points):
 
             self._grid[i] = np.power(step, i)
             self._grid2[i] = self._grid[i] * self._grid[i]
@@ -88,7 +88,7 @@ class ChangCooper(object):
 
         self._delta_j = np.zeros(self._n_grid_points)
 
-        for j in xrange(self._n_grid_points-1):
+        for j in range(self._n_grid_points-1):
 
             if self._dispersion_term[j] != 0:
 
@@ -117,7 +117,7 @@ class ChangCooper(object):
 
         # walk backwards in j starting from the second to last index
         # then set the end points
-        for j_minus_one in xrange(self._n_grid_points - 2, 0, -1):
+        for j_minus_one in range(self._n_grid_points - 2, 0, -1):
 
             # j is one step ahead
             j = j_minus_one + 1
@@ -205,7 +205,7 @@ class ChangCooper(object):
 
         if self._a_non_zero:
 
-            for i in xrange(1, self._n_grid_points):
+            for i in range(1, self._n_grid_points):
 
                 self._cprime[i] = self._c[i] / (
                     self._b[i] - self._a[i] * self._cprime[i - 1])
@@ -226,7 +226,7 @@ class ChangCooper(object):
 
         # backwards step to the beginning
 
-        for j in xrange(self._n_grid_points - 2, -1, -1):
+        for j in range(self._n_grid_points - 2, -1, -1):
 
             n_j_plus_1[
                 j] = self._dprime[j] - self._cprime[j] * n_j_plus_1[j + 1]
