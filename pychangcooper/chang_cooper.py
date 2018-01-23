@@ -310,4 +310,4 @@ class ChangCooper(object):
     @property
     def history(self):
 
-        return self._saved_grids
+        return np.array(self._saved_grids)
