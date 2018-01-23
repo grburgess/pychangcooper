@@ -31,7 +31,7 @@ class ChangCooper(object):
 
             assert len(initial_distribution) == self._n_grid_points
 
-        
+            self._n_current = np.array(initial_distribution)
 
         
         # define the heating and dispersion terms
