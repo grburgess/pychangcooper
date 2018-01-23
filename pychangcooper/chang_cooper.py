@@ -1,9 +1,8 @@
 import numpy as np
 
 
-
 class ChangCooper(object):
-    def __init__(self, n_grid_points=300, max_grid=1E5, store_progress=False):
+    def __init__(self, n_grid_points=300, max_grid=1E5, delta_t=1., store_progress=False):
         """
         Generic Chang and Cooper base class. Currently, the dispersion and heating terms 
         are assumed to be time-independent
@@ -14,6 +13,8 @@ class ChangCooper(object):
 
         self._n_grid_points = n_grid_points
         self._max_grid = max_grid
+        self._delta_t = delta_t
+        
 
         self._store_progress = store_progress
         self._saved_grids = []
@@ -36,8 +37,6 @@ class ChangCooper(object):
 
         # if there are no dispersion terms we do not need to forward sweep
         self._a_non_zero = ~np.all(self._a == 0)
-
-        
 
     def _build_grid(self):
         """
@@ -89,7 +88,7 @@ class ChangCooper(object):
 
         self._delta_j = np.zeros(self._n_grid_points)
 
-        for j in xrange(self._n_grid_points):
+        for j in xrange(self._n_grid_points-1):
 
             if self._dispersion_term[j] != 0:
 
@@ -103,6 +102,7 @@ class ChangCooper(object):
 
                     self._delta_j[j] = 1. / w - 1. / (np.exp(w) - 1.)
 
+        
     def _setup_vectors(self):
         """
         from the specified terms in the subclasses, setup the tridiagonal terms
@@ -208,12 +208,10 @@ class ChangCooper(object):
             for i in xrange(1, self._n_grid_points):
 
                 self._cprime[i] = self._c[i] / (
-                    self._b[i] - self._a[i] * self._c_prime[i - 1])
+                    self._b[i] - self._a[i] * self._cprime[i - 1])
                 self._dprime[i] = (
                     self._d[i] - self._a[i] * self._dprime[i - 1]) / (
                         self._b[i] - self._a[i] * self._cprime[i - 1])
-
-
 
     def back_substitution(self):
         """
@@ -221,8 +219,6 @@ class ChangCooper(object):
         solver. 
         """
 
-
-        
         n_j_plus_1 = np.zeros(self._n_grid_points)
 
         # set the end points
@@ -232,22 +228,20 @@ class ChangCooper(object):
 
         for j in xrange(self._n_grid_points - 2, -1, -1):
 
-            n_j_plus_1[j] = self._dprime[j] - self._cprime[j] * n_j_plus_1[j + 1]
+            n_j_plus_1[
+                j] = self._dprime[j] - self._cprime[j] * n_j_plus_1[j + 1]
 
-                
         # set the new solution to the current one
 
         if self._store_progress:
 
             self._saved_grids.append(self._n_current)
-            
+
         self._n_current = n_j_plus_1
 
         # clean any numerical diffusion if needed
         # this must be customized
         self._clean()
-
-        
 
     def _clean(self):
 
