@@ -143,12 +143,12 @@ class ChangCooper(object):
                 self._delta_j[j_minus_one] * self._heating_term[j_minus_one])
 
             # n_j term
-            self._b[j_minus_one] = -self._delta_t * one_over_delta_grid * (
+            self._b[j_minus_one] = - one_over_delta_grid * (
                 one_over_delta_grid *
-                (self._dispersion_term[j] - self._dispersion_term[j_minus_one])
+                (self._dispersion_term[j] + self._dispersion_term[j_minus_one])
                 + (1 - self._delta_j[j_minus_one]
                    ) * self._heating_term[j_minus_one] -
-                self._delta_j[j] * self._heating_term[j]) + 1.
+                self._delta_j[j] * self._heating_term[j])
 
             # n_j+1 term
             self._c[j_minus_one] = one_over_delta_grid * (
@@ -167,8 +167,7 @@ class ChangCooper(object):
             self._delta_j[-1] * self._heating_term[-1])
 
         # n_j term
-        self._b[-1] = -self._delta_t * one_over_delta_grid * (
-            (1 - self._delta_j[-1]) * self._heating_term[-1]) + 1.
+        self._b[-1] = - one_over_delta_grid * (one_over_delta_grid * (self._dispersion_term[-1]) + (1 - self._delta_j[-1]) * self._heating_term[j_minus_one]) 
 
         # n_j+1 term
         self._c[-1] = 0
@@ -182,16 +181,19 @@ class ChangCooper(object):
         self._a[0] = 0.
 
         # n_j term
-        self._b[0] = -self._delta_t*one_over_delta_grid* ( one_over_delta_grid*(self._dispersion_term[0])\
+        self._b[0] = -one_over_delta_grid* ( one_over_delta_grid*(self._dispersion_term[0])\
                                            - self._delta_j[0] * self._heating_term[0]
-                                                    ) + 1.
+                                                    ) 
         # n_j+1 term
         self._c[0] = one_over_delta_grid*( ( 1- self._delta_j[0]) * self._heating_term[0] \
                                                     + one_over_delta_grid* self._dispersion_term[0]  )
 
-        self._a *= self._delta_t
-        self._c *= self._delta_t
+        # carry terms to the other side
+        self._a *= -self._delta_t
+        self._c *= -self._delta_t
+        self._b = (1 - self._b * self._delta_t)
 
+        
     def _compute_source_function(self):
         """
         compute the grid of the source term. This will just be zero if there is nothing 
@@ -272,7 +274,7 @@ class ChangCooper(object):
         increase the run iterator and the current time
         """
 
-        self._iteratate +=1
+        self._iterations += 1
         self._current_time += self._delta_t
 
     
