@@ -2,7 +2,12 @@ import numpy as np
 
 
 class ChangCooper(object):
-    def __init__(self, n_grid_points=300, max_grid=1E5, delta_t=1., initial_distribution=None, store_progress=False):
+    def __init__(self,
+                 n_grid_points=300,
+                 max_grid=1E5,
+                 delta_t=1.,
+                 initial_distribution=None,
+                 store_progress=False):
         """
         Generic Chang and Cooper base class. Currently, the dispersion and heating terms 
         are assumed to be time-independent
@@ -14,8 +19,8 @@ class ChangCooper(object):
         self._n_grid_points = n_grid_points
         self._max_grid = max_grid
         self._delta_t = delta_t
-        
-
+        self._iterations = 0
+        self._current_time = 0.
         self._store_progress = store_progress
         self._saved_grids = []
 
@@ -33,7 +38,6 @@ class ChangCooper(object):
 
             self._n_current = np.array(initial_distribution)
 
-        
         # define the heating and dispersion terms
         # must be implemented in the subclasses
         self._define_terms()
@@ -65,7 +69,6 @@ class ChangCooper(object):
         self._half_grid = np.zeros(self._n_grid_points)
         self._half_grid2 = np.zeros(self._n_grid_points)
 
-        
         # now build the grid and the half grid points
         # we also make squared terms just incase
         for i in range(self._n_grid_points):
@@ -98,7 +101,7 @@ class ChangCooper(object):
 
         self._delta_j = np.zeros(self._n_grid_points)
 
-        for j in range(self._n_grid_points-1):
+        for j in range(self._n_grid_points - 1):
 
             if self._dispersion_term[j] != 0:
 
@@ -110,9 +113,8 @@ class ChangCooper(object):
 
                 else:
 
-                    self._delta_j[j] = 1. / w - 1. / (np.exp(w) - 1.)
+                    self._delta_j[j] = (1. / w) - 1. / (np.exp(w) - 1.)
 
-        
     def _setup_vectors(self):
         """
         from the specified terms in the subclasses, setup the tridiagonal terms
@@ -136,18 +138,22 @@ class ChangCooper(object):
             one_over_delta_grid = 1. / self._delta_half_grid[j_minus_one]
 
             # n_j-1 term
-            self._a[j_minus_one] = one_over_delta_grid* ( one_over_delta_grid*self._dispersion_term[j_minus_one] \
-                                                         + self._delta_j[j_minus_one]* self._heating_term[j_minus_one])
+            self._a[j_minus_one] = one_over_delta_grid * (
+                one_over_delta_grid * self._dispersion_term[j_minus_one] +
+                self._delta_j[j_minus_one] * self._heating_term[j_minus_one])
 
             # n_j term
-            self._b[j_minus_one] = -self._delta_t * one_over_delta_grid* ( one_over_delta_grid*(self._dispersion_term[j] - self._dispersion_term[j_minus_one] )\
-                                                        + (1- self._delta_j[j_minus_one]) * self._heating_term[j_minus_one]  \
-                                                        - self._delta_j[j] * self._heating_term[j]
-                                                        ) + 1.
+            self._b[j_minus_one] = -self._delta_t * one_over_delta_grid * (
+                one_over_delta_grid *
+                (self._dispersion_term[j] - self._dispersion_term[j_minus_one])
+                + (1 - self._delta_j[j_minus_one]
+                   ) * self._heating_term[j_minus_one] -
+                self._delta_j[j] * self._heating_term[j]) + 1.
 
             # n_j+1 term
-            self._c[j_minus_one] = one_over_delta_grid*( ( 1- self._delta_j[j]) * self._heating_term[j] \
-                                                        + one_over_delta_grid* self._dispersion_term[j]  )
+            self._c[j_minus_one] = one_over_delta_grid * (
+                (1 - self._delta_j[j]) * self._heating_term[j] +
+                one_over_delta_grid * self._dispersion_term[j])
 
         # now set the end points
 
@@ -156,8 +162,9 @@ class ChangCooper(object):
 
         one_over_delta_grid = 1. / self._delta_half_grid[-1]
         # n_j-1 term
-        self._a[-1] =  one_over_delta_grid* ( one_over_delta_grid*self._dispersion_term[-1] \
-                                                         + self._delta_j[-1]* self._heating_term[-1])
+        self._a[-1] = one_over_delta_grid * (
+            one_over_delta_grid * self._dispersion_term[-1] +
+            self._delta_j[-1] * self._heating_term[-1])
 
         # n_j term
         self._b[-1] = -self._delta_t * one_over_delta_grid * (
@@ -253,10 +260,24 @@ class ChangCooper(object):
         # this must be customized
         self._clean()
 
+        # bump up the iteration number and the time 
+        self._iteratate()
+
     def _clean(self):
 
         pass
 
+    def _iteratate(self):
+        """
+        increase the run iterator and the current time
+        """
+
+        self._iteratate +=1
+        self._current_time += self._delta_t
+
+    
+
+    
     @property
     def delta_j(self):
         """
