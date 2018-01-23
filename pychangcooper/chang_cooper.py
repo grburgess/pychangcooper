@@ -279,7 +279,16 @@ class ChangCooper(object):
 
     
 
-    
+    @property
+    def current_time(self):
+
+        return self._current_time
+
+    @property
+    def n_iterations(self):
+
+        return self._iterations
+        
     @property
     def delta_j(self):
         """
