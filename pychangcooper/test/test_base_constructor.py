@@ -52,7 +52,7 @@ def test_chang_cooper_constructor():
 
     assert len(dummy.n) == grid_size
     
-    assert dummy.history == []
+    assert len(dummy.history) == 0
 
     assert dummy._a_non_zero
     # now with no dispersion
