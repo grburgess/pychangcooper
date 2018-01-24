@@ -49,7 +49,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            pytest -vv --cov-report=cov_report --cov=pychangcooper pychangcooper/test
+            pytest -vv --cov-report=term --cov=pychangcooper pychangcooper/test
 
       - store_artifacts:
           path: test-reports
