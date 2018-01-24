@@ -93,6 +93,13 @@ class ChangCooper(object):
         self._delta_half_grid = np.diff(self._grid)
         self._delta_grid = np.diff(self._half_grid)
 
+    
+
+        
+
+        
+
+        
     def _compute_delta_j(self):
         """
         delta_j controls where the differences are computed. If there are no dispersion
@@ -139,7 +146,7 @@ class ChangCooper(object):
 
             # n_j-1 term
             self._a[j_minus_one] = one_over_delta_grid * (
-                one_over_delta_grid * self._dispersion_term[j_minus_one] +
+                one_over_delta_grid * self._dispersion_term[j_minus_one] -
                 self._delta_j[j_minus_one] * self._heating_term[j_minus_one])
 
             # n_j term
@@ -163,7 +170,7 @@ class ChangCooper(object):
         one_over_delta_grid = 1. / self._delta_half_grid[-1]
         # n_j-1 term
         self._a[-1] = one_over_delta_grid * (
-            one_over_delta_grid * self._dispersion_term[-1] +
+            one_over_delta_grid * self._dispersion_term[-1] -
             self._delta_j[-1] * self._heating_term[-1])
 
         # n_j term
@@ -172,7 +179,7 @@ class ChangCooper(object):
         # n_j+1 term
         self._c[-1] = 0
 
-        # right boundary
+        # left boundary
         # j-1/2 = 0
 
         one_over_delta_grid = 1. / self._delta_half_grid[0]
