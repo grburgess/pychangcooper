@@ -47,7 +47,7 @@ class SynchrotronCooling(ChangCooper):
 
         self._dispersion_term = np.zeros(self._n_grid_points)
 
-        self._heating_term = -self._cool * self._half_grid2
+        self._heating_term = self._cool * self._half_grid2
 
     def _source_function(self, energy):
         """
@@ -65,7 +65,7 @@ class SynchrotronCooling(ChangCooper):
     def run(self):
 
         with progress_bar(int(self._steps), title='cooling electrons') as p:
-            for i in xrange(int(self._steps)):
+            for i in range(int(self._steps)):
 
                 self.forward_sweep()
                 self.back_substitution()
