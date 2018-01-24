@@ -32,7 +32,7 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install numpy matplotlib ipython pytest
+            pip install numpy matplotlib ipython pytest-cov 
             python setup.py install
 
       # - save_cache:
@@ -49,7 +49,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            pytest pychangcooper/test -vv
+            pytest -vv --cov-report=cov_report --cov=pychangcooper pychangcooper/test
 
       - store_artifacts:
           path: test-reports
