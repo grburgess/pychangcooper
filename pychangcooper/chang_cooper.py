@@ -179,7 +179,7 @@ class ChangCooper(object):
         # n_j+1 term
         self._c[-1] = 0
 
-        # right boundary
+        # left boundary
         # j-1/2 = 0
 
         one_over_delta_grid = 1. / self._delta_half_grid[0]
