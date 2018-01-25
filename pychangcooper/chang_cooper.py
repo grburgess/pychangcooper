@@ -18,8 +18,7 @@ class ChangCooper(object):
         :param max_grid: the maximum energy of the grid
         """
 
-        self._heating_term = None
-        self._dispersion_term = None
+
         self._n_grid_points = n_grid_points
         self._max_grid = max_grid
         self._delta_t = delta_t
