@@ -93,12 +93,6 @@ class ChangCooper(object):
         self._delta_half_grid = np.diff(self._grid)
         self._delta_grid = np.diff(self._half_grid)
 
-    
-
-        
-
-        
-
         
     def _compute_delta_j(self):
         """
