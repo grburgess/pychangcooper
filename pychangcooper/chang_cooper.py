@@ -156,9 +156,9 @@ class ChangCooper(object):
 
         # initialize everything to zerp
 
-        self._a = np.zeros(self._n_grid_points)
-        self._b = np.zeros(self._n_grid_points)
-        self._c = np.zeros(self._n_grid_points)
+        a = np.zeros(self._n_grid_points)
+        b = np.zeros(self._n_grid_points)
+        c = np.zeros(self._n_grid_points)
 
         # walk backwards in j starting from the second to last index
         # then set the end points
@@ -176,13 +176,13 @@ class ChangCooper(object):
             C_backward = self._dispersion_term[j_minus_one]
 
             # n_j-1 term
-            self._a[j_minus_one] = ChangCooper._compute_n_j_minus_one_term(one_over_delta_grid=one_over_delta_grid,
+            a[j_minus_one] = ChangCooper._compute_n_j_minus_one_term(one_over_delta_grid=one_over_delta_grid,
                                                                            C_backward=C_backward,
                                                                            B_backward=B_backward,
                                                                            delta_j_minus_one=self._delta_j[j_minus_one])
 
             # n_j term
-            self._b[j_minus_one] = ChangCooper._compute_n_j(one_over_delta_grid=one_over_delta_grid,
+            b[j_minus_one] = ChangCooper._compute_n_j(one_over_delta_grid=one_over_delta_grid,
                                                             C_backward=C_backward,
                                                             C_forward=C_forward,
                                                             B_backward=B_backward,
@@ -192,7 +192,7 @@ class ChangCooper(object):
                                                             delta_j=self._delta_j[j])
 
             # n_j+1 term
-            self._c[j_minus_one] = ChangCooper._compute_n_j_plus_one(one_over_delta_grid=one_over_delta_grid,
+            c[j_minus_one] = ChangCooper._compute_n_j_plus_one(one_over_delta_grid=one_over_delta_grid,
                                                                      C_forward=C_forward,
                                                                      B_forward=B_forward,
                                                                      one_minus_delta_j=self._one_minus_delta_j[j])
@@ -205,13 +205,13 @@ class ChangCooper(object):
 
         one_over_delta_grid = 1. / self._delta_half_grid[-1]
         # n_j-1 term
-        self._a[-1] = ChangCooper._compute_n_j_minus_one_term(one_over_delta_grid=one_over_delta_grid,
+        a[-1] = ChangCooper._compute_n_j_minus_one_term(one_over_delta_grid=one_over_delta_grid,
                                                               C_backward=self._dispersion_term[-1],
                                                               B_backward=self._heating_term[-1],
                                                               delta_j_minus_one=self._delta_j[-1])
 
         # n_j term
-        self._b[-1] = ChangCooper._compute_n_j(one_over_delta_grid=one_over_delta_grid,
+        b[-1] = ChangCooper._compute_n_j(one_over_delta_grid=one_over_delta_grid,
                                                C_backward=self._dispersion_term[-1],
                                                C_forward=0,
                                                B_backward=self._heating_term[-1],
@@ -220,7 +220,7 @@ class ChangCooper(object):
                                                delta_j=0)
 
         # n_j+1 term
-        self._c[-1] = 0
+        c[-1] = 0
 
         ###############
         # left boundary
@@ -229,10 +229,10 @@ class ChangCooper(object):
         one_over_delta_grid = 1. / self._delta_half_grid[0]
 
         # n_j-1 term
-        self._a[0] = 0.
+        a[0] = 0.
 
         # n_j term
-        self._b[0] = ChangCooper._compute_n_j(one_over_delta_grid=one_over_delta_grid,
+        b[0] = ChangCooper._compute_n_j(one_over_delta_grid=one_over_delta_grid,
                                               C_backward=0,
                                               C_forward=self._dispersion_term[0],
                                               B_backward=0,
@@ -240,20 +240,21 @@ class ChangCooper(object):
                                               one_minus_delta_j_minus_one=0,
                                               delta_j=self._delta_j[1])
         # n_j+1 term
-        self._c[0] = ChangCooper._compute_n_j_plus_one(one_over_delta_grid=one_over_delta_grid,
+        c[0] = ChangCooper._compute_n_j_plus_one(one_over_delta_grid=one_over_delta_grid,
                                                        C_forward=self._dispersion_term[0],
                                                        B_forward=self._heating_term[0],
                                                        one_minus_delta_j=self._one_minus_delta_j[0])
 
         # carry terms to the other side
-        self._a *= -self._delta_t
-        self._c *= -self._delta_t
+        a *= -self._delta_t
+        b = (1 - b * self._delta_t) + self._escape_grid * self._delta_t
+        c *= -self._delta_t
 
-        self._b = (1 - self._b * self._delta_t) + self._escape_grid * self._delta_t
+
 
         # now make a tridiagonal_solver for these terms
 
-        self._tridiagonal_solver = TridiagonalSolver(self._a, self._b, self._c)
+        self._tridiagonal_solver = TridiagonalSolver(a, b, c)
 
     def _compute_source_function_and_escape(self):
         """
