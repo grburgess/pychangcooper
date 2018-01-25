@@ -11,7 +11,7 @@ setup(
     author_email='jmichaelburgess@gmail.com',
 
     requires=[
-        'numpy'
+        'numpy',
         'matplotlib'
     ],
 )
