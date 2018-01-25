@@ -54,7 +54,7 @@ def test_chang_cooper_constructor():
     
     assert len(dummy.history) == 0
 
-    assert dummy._a_non_zero
+
     # now with no dispersion
 
     
@@ -62,7 +62,7 @@ def test_chang_cooper_constructor():
 
     assert np.all(dummy.delta_j == 0)
 
-    assert not dummy._a_non_zero
+
 
 def test_history():
 
@@ -70,24 +70,24 @@ def test_history():
 
     dummy = DummyChild(n_grid_points=grid_size , max_grid = 100., delta_t = 1.)
 
-    dummy.forward_sweep()
-    dummy.back_substitution()
+    dummy.solve_time_step()
+
 
     assert len(dummy.history) == 0
 
 
     dummy = DummyChild(n_grid_points=grid_size , max_grid = 100., delta_t = 1., store_progress=True)
 
-    dummy.forward_sweep()
-    dummy.back_substitution()
+    dummy.solve_time_step()
+    
 
     save_n1 = dummy.n
     
     assert len(dummy.history) == 1
 
 
-    dummy.forward_sweep()
-    dummy.back_substitution()
+    dummy.solve_time_step()
+
 
     save_n2 = dummy.n
     

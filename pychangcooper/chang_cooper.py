@@ -1,5 +1,6 @@
 import numpy as np
 
+from pychangcooper.tridiagonal_solver import TridiagonalSolver
 
 class ChangCooper(object):
     def __init__(self,
@@ -194,6 +195,10 @@ class ChangCooper(object):
         self._c *= -self._delta_t
         self._b = (1 - self._b * self._delta_t)
 
+        # now make a tridiagonal_solver for these terms
+        
+        self._tridiagonal_solver = TridiagonalSolver(self._a, self._b, self._c)
+        
         
     def _compute_source_function(self):
         """
@@ -211,53 +216,23 @@ class ChangCooper(object):
 
         RuntimeError('Must be implemented in subclass')
 
-    def forward_sweep(self):
-        """
-        This is the forward sweep of the tridiagonal solver
-        """
 
-        # set the term to the current solution plus the source term
-        self._d = self._n_current + self._source_grid * self._delta_t
 
-        # elimiate the a terms... unless they are zero
-        self._cprime = self._c / self._b
-        self._dprime = self._d / self._b
+    def solve_time_step(self):
 
-        if self._a_non_zero:
 
-            for i in range(1, self._n_grid_points):
-
-                self._cprime[i] = self._c[i] / (
-                    self._b[i] - self._a[i] * self._cprime[i - 1])
-                self._dprime[i] = (
-                    self._d[i] - self._a[i] * self._dprime[i - 1]) / (
-                        self._b[i] - self._a[i] * self._cprime[i - 1])
-
-    def back_substitution(self):
-        """
-        This is the backwards substitution step of the tridiagonal
-        solver. 
-        """
-
-        n_j_plus_1 = np.zeros(self._n_grid_points)
-
-        # set the end points
-        n_j_plus_1[-1] = self._dprime[-1]
-
-        # backwards step to the beginning
-
-        for j in range(self._n_grid_points - 2, -1, -1):
-
-            n_j_plus_1[
-                j] = self._dprime[j] - self._cprime[j] * n_j_plus_1[j + 1]
-
-        # set the new solution to the current one
-
+        
         if self._store_progress:
 
             self._saved_grids.append(self._n_current)
 
-        self._n_current = n_j_plus_1
+        
+        d = self._n_current + self._source_grid * self._delta_t
+
+
+        # set the new solution to the current one
+        self._n_current = self._tridiagonal_solver.solve(d)
+
 
         # clean any numerical diffusion if needed
         # this must be customized
