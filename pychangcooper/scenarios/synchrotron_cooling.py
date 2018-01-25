@@ -80,3 +80,28 @@ class SynchrotronCooling(ChangCooper):
         idx = self._grid <= lower_bound
 
         self._n_current[idx] = 0.
+
+
+class SynchrotronCoolingWithEscape(SynchrotronCooling):
+    def __init__(self,
+                 B=10.,
+                 index= -2.2,
+                 gamma_injection=1E3,
+                 gamma_cool=2E3,
+                 gamma_max=1E5,
+                 n_grid_points=300,
+                 max_gamma=1E5,
+                 t_esc=1.,
+                 initial_distribution = None,
+                 store_progress=False):
+
+
+
+        self._t_esc = t_esc
+
+        super(SynchrotronCoolingWithEscape, self).__init__(B,index,gamma_injection,gamma_cool,gamma_max,n_grid_points,max_gamma,initial_distribution,store_progress)
+
+    def _escape_function(self,energy):
+        print('here')
+
+        return 1./self._t_esc

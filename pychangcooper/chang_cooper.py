@@ -43,8 +43,8 @@ class ChangCooper(object):
         # must be implemented in the subclasses
         self._define_terms()
 
-        # compute the source function if there is any
-        self._compute_source_function()
+        # compute the source/escape function if there is any
+        self._compute_source_function_and_escape()
 
         # compute the delta_js which control the upwind and downwind scheme
         self._compute_delta_j()
@@ -101,22 +101,31 @@ class ChangCooper(object):
         terms, then delta_j is zero
         """
 
+        # set to zero. note delta_j[n] = 0 by default
         self._delta_j = np.zeros(self._n_grid_points)
 
-        for j in range(self._n_grid_points - 1):
+        # if the dispersion term is 0, then we just need a centered difference
+        idx_dispersion_non_zero = self._dispersion_term[:-1] != 0
 
-            if self._dispersion_term[j] != 0:
+        # compute w
+        w = (self._delta_half_grid[idx_dispersion_non_zero] * self._heating_term[:-1][idx_dispersion_non_zero]) / self._dispersion_term[:-1][idx_dispersion_non_zero]
 
-                w = (self._delta_half_grid[j] * self._heating_term[j]) / (
-                    self._dispersion_term[j])
+        # where w = 0, delta is 0.5 => forward difference
+        idx_w_zero = w==0
 
-                if w == 0:
-                    self._delta_j[j] = 0.5
+        self._delta_j[:-1][idx_dispersion_non_zero][idx_w_zero] = 0.5
 
-                else:
 
-                    self._delta_j[j] = (1. / w) - 1. / (np.exp(w) - 1.)
+        # else where, use the asymmptotic approach
+        self._delta_j[:-1][idx_dispersion_non_zero][~idx_w_zero] = (1. / w[~idx_w_zero]) - 1. / (np.exp(w[~idx_w_zero]) - 1.)
 
+        # make sure the end delta is set
+        assert self._delta_j[-1] == 0, 'last delta_j is not zero!'
+
+        # precomoute 1- delta_j
+        self._one_minus_delta_j = 1- self._delta_j
+
+        
     def _setup_vectors(self):
         """
         from the specified terms in the subclasses, setup the tridiagonal terms
@@ -139,34 +148,37 @@ class ChangCooper(object):
             # pre compute one over the delta of the grid
             one_over_delta_grid = 1. / self._delta_half_grid[j_minus_one]
 
+
+            B_forward = self._heating_term[j]
+            B_backward = self._heating_term[j_minus_one]
+
+            C_forward = self._dispersion_term[j]
+            C_backward = self._dispersion_term[j_minus_one]
+            
+
+            
             # n_j-1 term
             self._a[j_minus_one] = one_over_delta_grid * (
-                one_over_delta_grid * self._dispersion_term[j_minus_one] -
-                self._delta_j[j_minus_one] * self._heating_term[j_minus_one])
+                one_over_delta_grid * C_backward - self._delta_j[j_minus_one] * B_backward)
 
             # n_j term
             self._b[j_minus_one] = - one_over_delta_grid * (
-                one_over_delta_grid *
-                (self._dispersion_term[j] + self._dispersion_term[j_minus_one])
-                + (1 - self._delta_j[j_minus_one]
-                   ) * self._heating_term[j_minus_one] -
-                self._delta_j[j] * self._heating_term[j])
+                one_over_delta_grid * (C_forward + C_backward) + self._one_minus_delta_j[j_minus_one] * B_backward - self._delta_j[j] * B_forward)
 
             # n_j+1 term
             self._c[j_minus_one] = one_over_delta_grid * (
-                (1 - self._delta_j[j]) * self._heating_term[j] +
-                one_over_delta_grid * self._dispersion_term[j])
+                self._one_minus_delta_j[j] * B_forward + one_over_delta_grid * C_forward)
 
         # now set the end points
 
+        ################
         # right boundary
         # j+1/2 = 0
 
         one_over_delta_grid = 1. / self._delta_half_grid[-1]
         # n_j-1 term
         self._a[-1] = one_over_delta_grid * (
-            one_over_delta_grid * self._dispersion_term[-1] -
-            self._delta_j[-1] * self._heating_term[-1])
+            one_over_delta_grid * self._dispersion_term[-1] - self._delta_j[-1] * self._heating_term[-1])
 
         # n_j term
         self._b[-1] = - one_over_delta_grid * (one_over_delta_grid * (self._dispersion_term[-1]) + (1 - self._delta_j[-1]) * self._heating_term[j_minus_one]) 
@@ -174,6 +186,7 @@ class ChangCooper(object):
         # n_j+1 term
         self._c[-1] = 0
 
+        ###############
         # left boundary
         # j-1/2 = 0
 
@@ -183,35 +196,43 @@ class ChangCooper(object):
         self._a[0] = 0.
 
         # n_j term
-        self._b[0] = -one_over_delta_grid* ( one_over_delta_grid*(self._dispersion_term[0])\
-                                           - self._delta_j[0] * self._heating_term[0]
+        self._b[0] = -one_over_delta_grid* (
+            one_over_delta_grid*(self._dispersion_term[0]) - self._delta_j[0] * self._heating_term[0]
                                                     ) 
         # n_j+1 term
-        self._c[0] = one_over_delta_grid*( ( 1- self._delta_j[0]) * self._heating_term[0] \
-                                                    + one_over_delta_grid* self._dispersion_term[0]  )
+        self._c[0] = one_over_delta_grid*(
+            self._one_minus_delta_j[0] * self._heating_term[0] + one_over_delta_grid* self._dispersion_term[0]  )
 
         # carry terms to the other side
         self._a *= -self._delta_t
         self._c *= -self._delta_t
-        self._b = (1 - self._b * self._delta_t)
+        
+        self._b = (1 - self._b * self._delta_t) + self._escape_grid * self._delta_t
 
         # now make a tridiagonal_solver for these terms
         
         self._tridiagonal_solver = TridiagonalSolver(self._a, self._b, self._c)
         
         
-    def _compute_source_function(self):
+    def _compute_source_function_and_escape(self):
         """
         compute the grid of the source term. This will just be zero if there is nothing 
         added and all will be zero
         """
 
         self._source_grid = self._source_function(self._grid)
+        self._escape_grid = self._escape_function(self._grid)
 
+        
     def _source_function(self, energy):
 
         return 0.
 
+
+    def _escape_function(self, energy):
+
+        return 0
+    
     def _define_terms(self):
 
         RuntimeError('Must be implemented in subclass')
