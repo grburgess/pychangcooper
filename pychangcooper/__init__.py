@@ -1,2 +1,2 @@
 from pychangcooper.chang_cooper import ChangCooper
-from pychangcooper.synchrotron_cooling import SynchrotronCooling
+from pychangcooper.scenarios.synchrotron_cooling import SynchrotronCooling
