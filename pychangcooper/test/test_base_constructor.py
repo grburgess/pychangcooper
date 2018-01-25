@@ -40,11 +40,6 @@ def test_chang_cooper_constructor():
     assert len(dummy._half_grid2) == grid_size
 
 
-    assert len(dummy._a) == grid_size
-    assert len(dummy._b) == grid_size
-    assert len(dummy._c) == grid_size
-
-
     # there was no souce specified
     assert np.all(dummy._source_grid == 0)
 
