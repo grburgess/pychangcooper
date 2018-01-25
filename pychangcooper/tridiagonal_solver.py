@@ -67,10 +67,11 @@ class TridiagonalSolver(object):
 
             for i in range(1, self._n_grid_points):
 
-                self._cprime[i] = self._c[i] / (
-                    self._b[i] - self._a[i] * self._cprime[i - 1])
-                self._dprime[i] = (d[i] - self._a[i] * self._dprime[i - 1]) / (
-                        self._b[i] - self._a[i] * self._cprime[i - 1])
+                b_minus_ac = self._b[i] - self._a[i]*self._cprime[i-1]
+                
+                self._cprime[i] = self._c[i] / b_minus_ac
+                
+                self._dprime[i] = (d[i] - self._a[i] * self._dprime[i - 1]) / b_minus_ac
 
 
 
