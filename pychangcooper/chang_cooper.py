@@ -54,8 +54,7 @@ class ChangCooper(object):
         # now compute the tridiagonal terms
         self._setup_vectors()
 
-        # if there are no dispersion terms we do not need to forward sweep
-        self._a_non_zero = ~np.all(self._a == 0)
+
 
     def _build_grid(self):
         """
