@@ -7,6 +7,7 @@ from pychangcooper.utils.progress_bar import progress_bar
 class SynchrotronCooling(ChangCooper):
     def __init__(self,
                  B=10.,
+                 index= -2.2,
                  gamma_injection=1E3,
                  gamma_cool=2E3,
                  gamma_max=1E5,
@@ -35,6 +36,7 @@ class SynchrotronCooling(ChangCooper):
         self._gamma_cool = gamma_cool
         self._gamma_injection = gamma_injection
 
+        self._index = index
         self._cool = 1.29234E-9 * B * B
 
         delta_t = sync_cool / (gamma_max)
@@ -59,7 +61,7 @@ class SynchrotronCooling(ChangCooper):
         idx = (self._gamma_injection <= self._grid) & (self._grid <=
                                                        self._gamma_max)
 
-        out[idx] = np.power(self._grid[idx], -2)
+        out[idx] = np.power(self._grid[idx], self._index)
         return out
 
     def run(self):
@@ -67,8 +69,7 @@ class SynchrotronCooling(ChangCooper):
         with progress_bar(int(self._steps), title='cooling electrons') as p:
             for i in range(int(self._steps)):
 
-                self.forward_sweep()
-                self.back_substitution()
+                self.solve_time_step()
 
                 p.increase()
 
