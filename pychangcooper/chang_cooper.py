@@ -404,11 +404,17 @@ class ChangCooper(object):
 
     @property
     def n(self):
-
+        """
+        The current solution
+        """
+        
         return self._n_current
 
     @property
     def history(self):
+        """
+        The history of the solution
+        """
 
         return np.array(self._saved_grids)
 
