@@ -89,34 +89,29 @@ class ChangCooper(object):
 
         # define the delta of the grid
 
-        ###############
-        # left boundary
-        # j-1/2 = 0
+        # we need to add extra end points to the grid
+        # so that we can compute the delta at the boundaries
 
-        first_delta_gamma =  self._grid[0] * (1 - 1./self._step)
-        last_delta_gamma =  self._grid[-1] * (self._step - 1)
+        first_delta_grid =  self._grid[0] * (1 - 1./self._step)
+        last_delta_grid =  self._grid[-1] * (self._step - 1)
 
-        delta_gamma = np.append([first_delta_gamma], np.diff(self._grid))
-        delta_gamma = np.append(delta_gamma,[last_delta_gamma])
+        delta_grid = np.append([first_delta_grid], np.diff(self._grid))
+        delta_grid = np.append(delta_grid,[last_delta_grid])
 
-        assert len(delta_gamma) == self._n_grid_points + 1
+        assert len(delta_grid) == self._n_grid_points + 1
 
+        # delta grid bar is  the average of the grid and applies to
+        # to the forward and backwards difference terms
+        # When the grid is not uniform, the second derivatives need
+        # to be taken in the correct place
+        
+        delta_grid_bar = np.mean( np.vstack( (delta_grid[:-1], delta_grid[1:]) ) ,axis=0)
 
-        delta_gamma_bar = np.mean( np.vstack( (delta_gamma[:-1], delta_gamma[1:]) ) ,axis=0)
+        assert len(delta_grid_bar) == self._n_grid_points
 
-        assert len(delta_gamma_bar) == self._n_grid_points
+        self._delta_grid = delta_grid
+        self._delta_grid_bar = delta_grid_bar
 
-        self._delta_grid = delta_gamma
-        self._delta_grid_bar = delta_gamma_bar
-
-
-        # # J-2 points
-        # self._delta_half_grid = np.diff(self._half_grid)
-        # assert len(self._delta_half_grid) == self._n_grid_points - 2
-
-        # # J -1 points
-        # self._delta_grid = np.diff(self._grid)
-        # assert len(self._delta_grid) == self._n_grid_points - 1
         
     def _compute_delta_j(self):
         """
@@ -134,15 +129,20 @@ class ChangCooper(object):
 
         for j in range(self._n_grid_points - 1):
 
+            # if the dispersion term is 0 => delta_j = 0 
             if self._dispersion_term[j] != 0:
+                
                 w = (self._delta_grid[1 : -1][j] * self._heating_term[j])/self._dispersion_term[j]
 
+                # w asymptotically approaches 1/2, but we need to set it manually
                 if w==0:
 
                     self._delta_j[j] = 0.5
 
+                # otherwise, we use appropriate bounds 
                 else:
-
+                    
+                    
                     self._delta_j[j] = ((1. / w) - 1. / (np.exp(w) - 1.) )
                     
 
@@ -168,16 +168,33 @@ class ChangCooper(object):
             
 
             # pre compute one over the delta of the grid
+            # this is the 1/delta_grid in front of the total
+            # equation.
+
             one_over_delta_grid = 1. / self._delta_grid[ k ]
+
+            # this is forward and backward delta grid in front of the dispersion
+            # term. It accounts for the second order part of the dispersion that
+            # is not accounted for in the original CC method
+            
             one_over_delta_grid_bar_forward = 1. / self._delta_grid_bar[ k+1 ]
             one_over_delta_grid_bar_backward = 1. / self._delta_grid_bar[ k ]
 
+            # The B_j +/- 1/2 from CC 
             B_forward = self._heating_term[k]
             B_backward = self._heating_term[k-1]
 
+            # The C_j +/- 1/2 from CC
             C_forward = self._dispersion_term[k]
             C_backward = self._dispersion_term[k-1]
 
+            # in order to keep math errors at a minimum, the tridiagonal terms
+            # are computed in separate functions so that boundary conditions are
+            # set consistently.
+
+            # First we solve (N - N) = F
+            # then we will move the terms to form a tridiagonal equation
+            
             # n_j-1 term
             a[k] = _compute_n_j_minus_one_term(one_over_delta_grid = one_over_delta_grid,
                                                one_over_delta_grid_bar_backward = one_over_delta_grid_bar_backward,
@@ -210,7 +227,7 @@ class ChangCooper(object):
         # j+1/2 = 0
 
         one_over_delta_grid = 1. / (self._grid[-1]*np.sqrt(self._step) - self._half_grid[-1] )
-        one_over_delta_grid_bar_forward = 0.#1. / self._delta_grid_bar[0]
+        one_over_delta_grid_bar_forward = 0.
         one_over_delta_grid_bar_backward = 1. / self._delta_grid_bar[ -1 ]
         
         # n_j-1 term
@@ -241,7 +258,7 @@ class ChangCooper(object):
         one_over_delta_grid = 1. / (self._half_grid[0] - self._grid[0]/np.sqrt(self._step) )
 
         one_over_delta_grid_bar_forward = 1. / self._delta_grid_bar[0]
-        one_over_delta_grid_bar_backward = 0.#1. / self._delta_grid_bar[ k ]
+        one_over_delta_grid_bar_backward = 0.
         
         # n_j-1 term
         a[0] = 0.
@@ -263,7 +280,10 @@ class ChangCooper(object):
                                      B_forward=self._heating_term[0],
                                      one_minus_delta_j=self._one_minus_delta_j[0])
 
-        # carry terms to the other side
+        # carry terms to the other side to form a tridiagonal equation
+        # the escape term is added on but is zero unless created in
+        # a child class
+        
         a *= -self._delta_t
         b = (1 - b * self._delta_t) + self._escape_grid * self._delta_t
         c *= -self._delta_t
@@ -296,20 +316,33 @@ class ChangCooper(object):
         RuntimeError('Must be implemented in subclass')
 
     def solve_time_step(self):
+        """
+        Solve for the next time step. 
+        """
 
+        # if we are storing the solutions, then append them
+        # to the history
+        
         if self._store_progress:
             self._saved_grids.append(self._n_current)
 
+        # set up the right side of the tridiagonal equation.
+        # This is the current distribution plus the source
+        # unless it is zero
+        
         d = self._n_current + self._source_grid * self._delta_t
 
         # set the new solution to the current one
+
         self._n_current = self._tridiagonal_solver.solve(d)
 
         # clean any numerical diffusion if needed
         # this must be customized
+
         self._clean()
 
         # bump up the iteration number and the time 
+
         self._iteratate()
 
     def _clean(self):
@@ -321,16 +354,27 @@ class ChangCooper(object):
         increase the run iterator and the current time
         """
 
+        # bump up the iteration number
+
         self._iterations += 1
+
+        # increase the time
+
         self._current_time += self._delta_t
 
     @property
     def current_time(self):
+        """
+        The current time: delta_t * n_iterations
+        """
 
         return self._current_time
 
     @property
     def n_iterations(self):
+        """
+        The number of iterations solved for
+        """
 
         return self._iterations
 
@@ -369,7 +413,16 @@ class ChangCooper(object):
         return np.array(self._saved_grids)
 
 
-def _compute_n_j_plus_one(one_over_delta_grid, one_over_delta_grid_bar_forward  ,C_forward, B_forward, one_minus_delta_j):
+def _compute_n_j_plus_one(one_over_delta_grid, one_over_delta_grid_bar_forward , C_forward, B_forward, one_minus_delta_j):
+    """
+    equation for the CC n_j +1 term
+
+    :param one_over_delta_grid: the total change in energy
+    :param one_over_delta_grid_bar_backward: the backward change in energy for the second derivative
+    :param C_forward: the forward dispersion term
+    :param B_forward: the forward heating term
+    :param one_minus_delta_j: 1 - delta_j
+    """
 
     return one_over_delta_grid * (
         one_minus_delta_j * B_forward + one_over_delta_grid_bar_forward * C_forward)
@@ -377,12 +430,34 @@ def _compute_n_j_plus_one(one_over_delta_grid, one_over_delta_grid_bar_forward  
 
 def _compute_n_j(one_over_delta_grid, one_over_delta_grid_bar_backward, one_over_delta_grid_bar_forward, C_backward, C_forward, B_backward, B_forward, one_minus_delta_j_minus_one,
                  delta_j):
+    """
+    equation for the CC n_j term
+
+    :param one_over_delta_grid: the total change in energy
+    :param one_over_delta_grid_bar_backward: the backward change in energy for the second derivative
+    :param one_over_delta_grid_bar_forward: the forward change in energy for the second derivative
+    :param C_forward: the forward dispersion term
+    :param C_backward: the backward dispersion term
+    :param B_forward: the forward heating term
+    :param B_backward: the backward heating term
+    :param one_minus_delta_j_minus_one: 1 - delta_j-1
+    """
 
     return - one_over_delta_grid * (
         (one_over_delta_grid_bar_forward *C_forward + one_over_delta_grid_bar_backward * C_backward) + one_minus_delta_j_minus_one * B_backward - delta_j * B_forward)
 
 
 def _compute_n_j_minus_one_term(one_over_delta_grid, one_over_delta_grid_bar_backward, C_backward, B_backward, delta_j_minus_one):
+    """
+    equation for the CC n_j-1 term
+
+    :param one_over_delta_grid: the total change in energy
+    :param one_over_delta_grid_bar_forward: the forward change in energy for the second derivative
+    :param C_backward: the backward dispersion term
+    :param B_backward: the backward heating term
+    :param one_minus_delta_j: 1 - delta_j
+    """
+
 
     return one_over_delta_grid * (
         one_over_delta_grid_bar_backward * C_backward - delta_j_minus_one * B_backward)
