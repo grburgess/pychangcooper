@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+from python_tricks import cmap_intervals
 
 from pychangcooper.tridiagonal_solver import TridiagonalSolver
 
@@ -370,6 +372,8 @@ class ChangCooper(object):
 
         return self._current_time
 
+
+
     @property
     def n_iterations(self):
         """
@@ -419,6 +423,69 @@ class ChangCooper(object):
         return np.array(self._saved_grids)
 
 
+    def plot_evolution(self, cmap='magma', skip = 1, show_legend = True, alpha=.3, reversed=False):
+        """
+        Plot the evolution of the spectra
+        """
+
+        fig, ax = plt.subplots()
+
+
+        solutions = self.history[::skip]
+
+        if reversed:
+
+            zorder = len(solutions)
+
+        else:
+            zorder = 0
+
+        colors = cmap_intervals(len(solutions),
+                                cmap=cmap)
+
+
+        for i, spec in enumerate(solutions):
+    
+    
+            ax.fill_between(self._grid,
+                            0,
+                            spec,
+                            color=colors[i],
+                            alpha=alpha,
+                            zorder=zorder
+
+            )
+
+
+
+            if reversed:
+
+                zorder-=1
+
+            else:
+                zorder+=1
+        
+        ax.plot(self._grid,
+                self._n_current,
+                color='k',
+                ls='--',
+                zorder= len(solutions)+1,
+                alpha=1,
+                label = 'final solution'
+        )        
+
+        ax.set_xscale('log')
+        ax.set_yscale('log')
+
+        ax.set_xlabel(r'$\gamma$')
+        ax.set_ylabel(r'$N(\gamma$,t)')
+
+        if show_legend:
+
+            ax.legend()
+        
+        return fig
+        
 def _compute_n_j_plus_one(one_over_delta_grid, one_over_delta_grid_bar_forward , C_forward, B_forward, one_minus_delta_j):
     """
     equation for the CC n_j +1 term
