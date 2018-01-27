@@ -41,13 +41,7 @@ class TridiagonalSolver(object):
         # this is basically the first step of the forward
         # sweep
         
-        
-        self._cprime = self._c / self._b
-        
-
-        
-
-        
+        self._cprime = self._c/self._b
 
         
     def _forward_sweep(self, d):
@@ -61,6 +55,9 @@ class TridiagonalSolver(object):
         # if we need to forward sweep, we must set the remaining
         # terms. Otherwise, they are just ratios
 
+        
+        
+        self._cprime = self._c / self._b
         self._dprime = d / self._b
 
         if self._a_non_zero:

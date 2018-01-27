@@ -1,2 +1,3 @@
 from pychangcooper.chang_cooper import ChangCooper
 from pychangcooper.scenarios.synchrotron_cooling import SynchrotronCooling, SynchrotronCoolingWithEscape
+from pychangcooper.scenarios.generic_cooling_acceleration import GenericCoolingAcceleration
