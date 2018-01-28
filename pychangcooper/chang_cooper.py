@@ -423,13 +423,24 @@ class ChangCooper(object):
         return np.array(self._saved_grids)
 
 
-    def plot_evolution(self, cmap='magma', skip = 1, show_legend = True, alpha=.3, reversed=False):
+    def plot_evolution(self,
+                       cmap='magma',
+                       skip = 1,
+                       show_legend = True,
+                       alpha=.3,
+                       reversed=False,
+                       show_final = False,
+                       show_initial = False,
+                       ax=None):
         """
         Plot the evolution of the spectra
         """
+        if ax is None:
+            fig, ax = plt.subplots()
 
-        fig, ax = plt.subplots()
+        else:
 
+            fig = ax.get_figure()
 
         solutions = self.history[::skip]
 
@@ -446,15 +457,21 @@ class ChangCooper(object):
 
         for i, spec in enumerate(solutions):
     
-    
-            ax.fill_between(self._grid,
-                            0,
-                            spec,
-                            color=colors[i],
-                            alpha=alpha,
-                            zorder=zorder
+            if i==0:
+                ax.plot(self._grid,
+                        spec,
+                        color=colors[i],
+                        alpha=alpha,
+                        zorder=zorder)
 
-            )
+
+            else:
+                ax.fill_between(self._grid,
+                                solutions[i-1],
+                                spec,
+                                color=colors[i],
+                                alpha=alpha,
+                                zorder=zorder)
 
 
 
@@ -464,16 +481,28 @@ class ChangCooper(object):
 
             else:
                 zorder+=1
-        
-        ax.plot(self._grid,
-                self._n_current,
-                color='k',
-                ls='--',
-                zorder= len(solutions)+1,
-                alpha=1,
-                label = 'final solution'
-        )        
+        if show_final:
+            ax.plot(self._grid,
+                    self._n_current,
+                    color='k',
+                    ls='--',
+                    zorder= len(solutions)+1,
+                    alpha=1,
+                    label = 'final solution'
+            )        
 
+
+        if show_initial:
+            ax.plot(self._grid,
+                    self.history[0],
+                    color='k',
+                    ls=':',
+                    zorder= len(solutions)+1,
+                    alpha=1,
+                    label = 'initial solution'
+            )        
+
+            
         ax.set_xscale('log')
         ax.set_yscale('log')
 
