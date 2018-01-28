@@ -60,7 +60,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            pytest -vv --cov-report=xml:coverage.xml --cov=./pychangcooper pychangcooper/test
+            pytest -vv --cov-report=xml:test-reports/coverage.xml --cov=./pychangcooper pychangcooper/test
 
       - store_artifacts:
           path: test-reports
