@@ -34,10 +34,14 @@ def test_chang_cooper_constructor():
 
     dummy = DummyChild(n_grid_points=grid_size , max_grid = 100., delta_t = 1.)
 
-    assert len(dummy.grid) == grid_size
+    assert len(dummy._grid) == grid_size
     assert len(dummy._grid2) == grid_size
-    assert len(dummy.half_grid) == grid_size
-    assert len(dummy._half_grid2) == grid_size
+    assert len(dummy._half_grid) == grid_size - 1
+    assert len(dummy._half_grid2) == grid_size - 1
+    assert len(dummy._delta_grid) == grid_size + 1
+    assert len(dummy._delta_grid_bar) == grid_size
+    
+    
 
 
     # there was no souce specified
@@ -92,4 +96,4 @@ def test_history():
 
     assert np.all(save_n2 == dummy.history[1])
 
-    
+    dummy.plot_evolution()
