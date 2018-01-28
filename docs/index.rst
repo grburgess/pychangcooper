@@ -4,13 +4,14 @@
    contain the root `toctree` directive.
 
 pychangcooper: a generic Fokker-Planck solver
-=========================================
+=============================================
 A simple numerical solver for Fokker-Planck style equations of the form:
 .. math::
    \frac{\partial N\left(\gamma, t\right)}{\partial t}  = \frac{\partial }{\partial \gamma} \left[ B \left(\gamma, t \right) + C \left(\gamma, t \right) \frac{\partial N\left(\gamma, t\right)}{\partial \gamma}\right]
    
 designed with an object-oriented interface to allow for easy problem specification via subclassing.
 
+Contents:
 
 .. toctree::
    :maxdepth: 5
@@ -21,3 +22,10 @@ designed with an object-oriented interface to allow for easy problem specificati
 
 .. automodule:: pychangcooper
    :members:
+
+Indices and tables
+==================
+ 
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
