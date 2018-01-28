@@ -1,6 +1,13 @@
 import numpy as np
-from pygsl.testing.sf import synchrotron_1
 
+try:
+    from pygsl.testing.sf import synchrotron_1
+
+    has_gsl = True
+    
+except(ImportError):
+
+    has_gsl = False
 
 class SynchrotronEmission(object):
 
@@ -19,9 +26,11 @@ class SynchrotronEmission(object):
         self._n_photon_energies = len(self._photon_energies)
         self._n_grid_points = len(self._gamma_grid)
 
+        if has_gsl:
+            self._build_synchrotron_kernel()
+        else:
 
-        self._build_synchrotron_kernel()
-
+            RuntimeWarning('There is no GSL, cannot compute')
     
     def _build_synchrotron_kernel(self):
         """
