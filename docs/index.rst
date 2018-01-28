@@ -7,9 +7,9 @@ Welcome to pychangcooper's documentation!
 =========================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
+   :maxdepth: 5
+   :hidden: 
+   notebooks/demo.ipynb  
 
 .. automodule:: pychangcooper
    :members:
