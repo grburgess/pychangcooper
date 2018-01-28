@@ -425,7 +425,7 @@ class ChangCooper(object):
     def plot_evolution(self,
                        cmap='magma',
                        skip = 1,
-                       show_legend = True,
+                       show_legend = False,
                        alpha=.3,
                        reversed=False,
                        show_final = False,
