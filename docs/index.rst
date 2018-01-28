@@ -8,7 +8,6 @@ Welcome to pychangcooper's documentation!
 
 .. toctree::
    :maxdepth: 5
-   :hidden: 
 
    notebooks/demo.ipynb  
 
