@@ -1,9 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from python_tricks import cmap_intervals
 
 from pychangcooper.tridiagonal_solver import TridiagonalSolver
-
+from pychangcooper.utils.cmap_intervals import cmap_intervals
 
 class ChangCooper(object):
     def __init__(self,
