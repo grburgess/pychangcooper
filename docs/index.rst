@@ -23,7 +23,8 @@ Contents:
 
 .. automodule:: pychangcooper
    :members:
-
+   :show-inheritance:
+      
 Indices and tables
 ==================
  
