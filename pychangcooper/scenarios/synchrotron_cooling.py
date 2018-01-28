@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 from python_tricks.cmap_cycle import cmap_intervals
 
+from pychangcooper.chang_cooper import ChangCooper
 from pychangcooper.synchrotron_emission import SynchrotronEmission
 from pychangcooper.utils.progress_bar import progress_bar
 from pychangcooper.utils.cmap_intervals import cmap_intervals
