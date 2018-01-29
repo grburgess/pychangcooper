@@ -169,17 +169,14 @@ class ChangCooper(object):
             
 
             # pre compute one over the delta of the grid
-            # this is the 1/delta_grid in front of the total
-            # equation.
+            # this is the 1/delta_grid in front of the F_j +/- 1/2.
 
-            one_over_delta_grid = 1. / self._delta_grid[ k ]
+            one_over_delta_grid_forward = 1. / self._delta_grid[k+1]
+            one_over_delta_grid_backward = 1. / self._delta_grid[k]
 
-            # this is forward and backward delta grid in front of the dispersion
-            # term. It accounts for the second order part of the dispersion that
-            # is not accounted for in the original CC method
+            # this is the delta grid in front of the full equation
             
-            one_over_delta_grid_bar_forward = 1. / self._delta_grid_bar[ k+1 ]
-            one_over_delta_grid_bar_backward = 1. / self._delta_grid_bar[ k ]
+            one_over_delta_grid_bar = 1. / self._delta_grid_bar[ k ]
 
             # The B_j +/- 1/2 from CC 
             B_forward = self._heating_term[k]
@@ -197,16 +194,16 @@ class ChangCooper(object):
             # then we will move the terms to form a tridiagonal equation
             
             # n_j-1 term
-            a[k] = _compute_n_j_minus_one_term(one_over_delta_grid = one_over_delta_grid,
-                                               one_over_delta_grid_bar_backward = one_over_delta_grid_bar_backward,
+            a[k] = _compute_n_j_minus_one_term(one_over_delta_grid = one_over_delta_grid_bar,
+                                               one_over_delta_grid_bar_backward = one_over_delta_grid_backward,
                                                C_backward = C_backward,
                                                B_backward = B_backward,
                                                delta_j_minus_one = self._delta_j[k-1])
 
             # n_j term
-            b[k] = _compute_n_j(one_over_delta_grid = one_over_delta_grid,
-                                one_over_delta_grid_bar_backward = one_over_delta_grid_bar_backward,
-                                one_over_delta_grid_bar_forward = one_over_delta_grid_bar_forward,
+            b[k] = _compute_n_j(one_over_delta_grid = one_over_delta_grid_bar,
+                                one_over_delta_grid_bar_backward = one_over_delta_grid_backward,
+                                one_over_delta_grid_bar_forward = one_over_delta_grid_forward,
                                 C_backward = C_backward,
                                 C_forward = C_forward,
                                 B_backward = B_backward,
@@ -215,8 +212,8 @@ class ChangCooper(object):
                                 delta_j=self._delta_j[k])
 
             # n_j+1 term
-            c[k] = _compute_n_j_plus_one(one_over_delta_grid = one_over_delta_grid,
-                                         one_over_delta_grid_bar_forward = one_over_delta_grid_bar_forward,
+            c[k] = _compute_n_j_plus_one(one_over_delta_grid = one_over_delta_grid_bar,
+                                         one_over_delta_grid_bar_forward = one_over_delta_grid_forward,
                                          C_forward = C_forward,
                                          B_forward = B_forward,
                                          one_minus_delta_j = self._one_minus_delta_j[k])
@@ -227,21 +224,24 @@ class ChangCooper(object):
         # right boundary
         # j+1/2 = 0
 
-        one_over_delta_grid = 1. / (self._grid[-1]*np.sqrt(self._step) - self._half_grid[-1] )
-        one_over_delta_grid_bar_forward = 0.
-        one_over_delta_grid_bar_backward = 1. / self._delta_grid_bar[ -1 ]
+        one_over_delta_grid_forward = 0.
+        one_over_delta_grid_backward = 1. / self._delta_grid[-1]
+            
+        one_over_delta_grid_bar = 1. / self._delta_grid_bar[ -1 ]
+
+
         
         # n_j-1 term
-        a[-1] = _compute_n_j_minus_one_term(one_over_delta_grid = one_over_delta_grid,
-                                            one_over_delta_grid_bar_backward = one_over_delta_grid_bar_backward,
+        a[-1] = _compute_n_j_minus_one_term(one_over_delta_grid = one_over_delta_grid_bar,
+                                            one_over_delta_grid_bar_backward = one_over_delta_grid_backward,
                                             C_backward = self._dispersion_term[-1],
                                             B_backward = self._heating_term[-1],
                                             delta_j_minus_one = self._delta_j[-1])
 
         # n_j term
-        b[-1] = _compute_n_j(one_over_delta_grid=one_over_delta_grid,
-                             one_over_delta_grid_bar_backward = one_over_delta_grid_bar_backward,
-                             one_over_delta_grid_bar_forward = one_over_delta_grid_bar_forward,
+        b[-1] = _compute_n_j(one_over_delta_grid=one_over_delta_grid_bar,
+                             one_over_delta_grid_bar_backward = one_over_delta_grid_backward,
+                             one_over_delta_grid_bar_forward = one_over_delta_grid_forward,
                              C_backward=self._dispersion_term[-1],
                              C_forward=0,
                              B_backward=self._heating_term[-1],
@@ -260,14 +260,23 @@ class ChangCooper(object):
 
         one_over_delta_grid_bar_forward = 1. / self._delta_grid_bar[0]
         one_over_delta_grid_bar_backward = 0.
+
+
+        
+        one_over_delta_grid_forward = 1. / self._delta_grid[0]
+        one_over_delta_grid_backward = 0
+            
+        one_over_delta_grid_bar = 1. / self._delta_grid_bar[0]
+
+
         
         # n_j-1 term
         a[0] = 0.
 
         # n_j term
-        b[0] = _compute_n_j(one_over_delta_grid=one_over_delta_grid,
-                            one_over_delta_grid_bar_backward = one_over_delta_grid_bar_backward,
-                            one_over_delta_grid_bar_forward = one_over_delta_grid_bar_forward,
+        b[0] = _compute_n_j(one_over_delta_grid=one_over_delta_grid_bar,
+                            one_over_delta_grid_bar_backward = one_over_delta_grid_backward,
+                            one_over_delta_grid_bar_forward = one_over_delta_grid_forward,
                             C_backward=0,
                             C_forward=self._dispersion_term[0],
                             B_backward=0,
@@ -275,8 +284,8 @@ class ChangCooper(object):
                             one_minus_delta_j_minus_one=0,
                             delta_j=self._delta_j[0])
         # n_j+1 term
-        c[0] = _compute_n_j_plus_one(one_over_delta_grid=one_over_delta_grid,
-                                     one_over_delta_grid_bar_forward = one_over_delta_grid_bar_forward,
+        c[0] = _compute_n_j_plus_one(one_over_delta_grid=one_over_delta_grid_bar,
+                                     one_over_delta_grid_bar_forward = one_over_delta_grid_forward,
                                      C_forward=self._dispersion_term[0],
                                      B_forward=self._heating_term[0],
                                      one_minus_delta_j=self._one_minus_delta_j[0])
