@@ -15,7 +15,7 @@ setup(
     author='J. Michael Burgess',
     author_email='jmichaelburgess@gmail.com',
     url = 'https://github.com/grburgess/pychangcooper',
-    download_url='https://github.com/grburgess/pychangcooper/archive/v1.1.tar.gz',
+    download_url='https://github.com/grburgess/pychangcooper/archive/1.1.1.tar.gz',
     requires=[
         'numpy',
         'matplotlib'
