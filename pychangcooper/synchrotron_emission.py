@@ -30,6 +30,11 @@ class SynchrotronEmission(object):
             self._build_synchrotron_kernel()
         else:
 
+            # this is a dummy for testing
+        
+            self._synchrotron_kernel = np.zeros((self._n_photon_energies, self._n_grid_points))
+
+            
             RuntimeWarning('There is no GSL, cannot compute')
     
     def _build_synchrotron_kernel(self):
