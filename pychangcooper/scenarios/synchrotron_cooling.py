@@ -117,9 +117,20 @@ class SynchrotronCooling(ChangCooper):
         
         
 
+    @property
+    def final_spectrum(self):
+
+        return self._total_spectrum
+
+    @property
+    def photon_energies(self):
+
+        return self._photon_energies
+        
     def plot_emission(self, cmap='viridis', skip=1, alpha=0.5, ax=None):
 
         if ax is None:
+
             fig, ax = plt.subplots()
 
         else:
@@ -206,3 +217,5 @@ class SynchrotronCoolingWithEscape(SynchrotronCooling):
         print('here')
 
         return 1./self._t_esc
+
+
