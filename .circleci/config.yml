@@ -51,7 +51,7 @@ jobs:
           command: |
             . venv/bin/activate
             ls
-            py.test -vv --ignore=venv --cov=pychangcooper
+            python -m pytest -vv --ignore=venv --cov=pychangcooper
             codecov
       
           
