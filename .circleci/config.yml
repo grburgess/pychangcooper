@@ -50,7 +50,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            pwd
+            ls
             py.test -vv --cov=pychangcooper pychangcooper/test
             codecov
       
