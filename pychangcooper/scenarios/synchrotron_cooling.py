@@ -5,7 +5,7 @@ from pychangcooper.chang_cooper import ChangCooper
 from pychangcooper.synchrotron_emission import SynchrotronEmission
 from pychangcooper.utils.progress_bar import progress_bar
 
-from pychangcooper.io.fill_plot import fill_plot_static
+from pychangcooper.io.fill_plot import fill_plot_static, fill_plot_animated
 
 class SynchrotronCooling(ChangCooper):
     def __init__(self,
@@ -128,14 +128,19 @@ class SynchrotronCooling(ChangCooper):
 
         return self._photon_energies
         
-    def plot_emission(self, cmap='viridis', skip=1, alpha=0.5, ax=None):
+    def plot_emission(self, cmap='viridis', skip=1, alpha=0.5, ax=None, animate = False):
 
 
             
         cumulative_spectrum = (self._all_spectra.cumsum(axis=0))[::skip]
 
+        if not animate:
 
-        fig = fill_plot_static(self._photon_energies, self._photon_energies**2 * cumulative_spectrum, cmap, alpha, ax)
+            fig = fill_plot_static(self._photon_energies, self._photon_energies**2 * cumulative_spectrum, cmap, alpha, ax)
+
+        else:
+
+            fig = fill_plot_animated(self._photon_energies, self._photon_energies**2 * cumulative_spectrum, cmap, alpha, ax)
 
         if ax is None:
 

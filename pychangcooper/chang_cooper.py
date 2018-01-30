@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from pychangcooper.tridiagonal_solver import TridiagonalSolver
-from pychangcooper.utils.cmap_intervals import cmap_intervals
+from pychangcooper.io.fill_plot import fill_plot_static
 
 class ChangCooper(object):
     def __init__(self,
@@ -435,60 +435,23 @@ class ChangCooper(object):
                        cmap='magma',
                        skip = 1,
                        show_legend = False,
-                       alpha=.3,
-                       reversed=False,
+                       alpha=.6,
                        show_final = False,
                        show_initial = False,
                        ax=None):
         """
         Plot the evolution of the spectra
         """
-        if ax is None:
-            fig, ax = plt.subplots()
 
-        else:
-
-            fig = ax.get_figure()
 
         solutions = self.history[::skip]
 
-        if reversed:
+        fig = fill_plot_static(self._grid, solutions, cmap, alpha, ax)
+        
+        if ax is None:
 
-            zorder = len(solutions)
-
-        else:
-            zorder = 0
-
-        colors = cmap_intervals(len(solutions),
-                                cmap=cmap)
-
-
-        for i, spec in enumerate(solutions):
-    
-            if i==0:
-                ax.plot(self._grid,
-                        spec,
-                        color=colors[i],
-                        alpha=alpha,
-                        zorder=zorder)
-
-
-            else:
-                ax.fill_between(self._grid,
-                                solutions[i-1],
-                                spec,
-                                color=colors[i],
-                                alpha=alpha,
-                                zorder=zorder)
-
-
-
-            if reversed:
-
-                zorder-=1
-
-            else:
-                zorder+=1
+            ax = fig.get_axes()[0]
+        
         if show_final:
             ax.plot(self._grid,
                     self._n_current,
