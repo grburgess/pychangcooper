@@ -10,12 +10,12 @@ setup(
 
     ],
     version='v1.1',
-    license='GPL'
+    license='GPL',
     description='A generic chang and cooper solver for fokker-planck equations',
     author='J. Michael Burgess',
     author_email='jmichaelburgess@gmail.com',
     url = 'https://github.com/grburgess/pychangcooper',
-    download_url='https://github.com/grburgess/pychangcooper/archive/1.1.1.tar.gz',
+    download_url='https://github.com/grburgess/pychangcooper/archive/1.1.2.tar.gz',
     requires=[
         'numpy',
         'matplotlib'
