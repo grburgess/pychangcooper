@@ -10,6 +10,7 @@ setup(
 
     ],
     version='v1.1',
+    license='GPL'
     description='A generic chang and cooper solver for fokker-planck equations',
     author='J. Michael Burgess',
     author_email='jmichaelburgess@gmail.com',
