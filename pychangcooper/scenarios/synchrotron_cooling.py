@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 from pychangcooper.chang_cooper import ChangCooper
 from pychangcooper.synchrotron_emission import SynchrotronEmission
 from pychangcooper.utils.progress_bar import progress_bar
-from pychangcooper.utils.cmap_intervals import cmap_intervals
+
+from pychangcooper.io.fill_plot import fill_plot_static
 
 class SynchrotronCooling(ChangCooper):
     def __init__(self,
@@ -129,44 +130,18 @@ class SynchrotronCooling(ChangCooper):
         
     def plot_emission(self, cmap='viridis', skip=1, alpha=0.5, ax=None):
 
-        if ax is None:
 
-            fig, ax = plt.subplots()
-
-        else:
-
-            fig = ax.get_figure()
             
         cumulative_spectrum = (self._all_spectra.cumsum(axis=0))[::skip]
 
 
-        colors = cmap_intervals(len(cumulative_spectrum), cmap)
+        fig = fill_plot_static(self._photon_energies, self._photon_energies**2 * cumulative_spectrum, cmap, alpha, ax)
 
-        zorder = len(cumulative_spectrum)
+        if ax is None:
+
+            ax = fig.get_axes()[0]
         
-        for i, spectrum in enumerate(cumulative_spectrum):
-
-            if i == 0:
-                ax.plot(self._photon_energies,
-                        self._photon_energies**2 * spectrum,
-                        zorder = zorder,
-                        color=colors[i],
-                        alpha=alpha
-            )
-
-
-            else:
-                ax.fill_between(self._photon_energies,
-                                self._photon_energies**2 * cumulative_spectrum[i-1],
-                                self._photon_energies**2 * spectrum,
-                                zorder = zorder,
-                                color=colors[i],
-                                alpha=alpha
-                )
-
-            zorder -=1
-
-
+        
         ax.set_xscale('log')
         ax.set_yscale('log')
 
@@ -179,7 +154,7 @@ class SynchrotronCooling(ChangCooper):
 
         fig, (ax1, ax2) = plt.subplots(1,2)
 
-        _ = self.plot_evolution(cmap=cmap, skip=skip, reversed=True, ax=ax1, alpha=alpha)
+        _ = self.plot_evolution(cmap=cmap, skip=skip, ax=ax1, alpha=alpha)
         _ = self.plot_emission(cmap = cmap, skip=skip, ax=ax2, alpha=alpha)
         ax2.yaxis.tick_right()
         ax2.yaxis.set_label_position("right")
