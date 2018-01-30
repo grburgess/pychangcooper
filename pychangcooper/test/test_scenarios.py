@@ -6,6 +6,9 @@ from pychangcooper.scenarios.synchrotron_cooling import SynchrotronCooling
 
 def test_synchrotron_cooling():
 
-    sc = SynchrotronCooling()
+    sc = SynchrotronCooling(store_progress=True)
 
-    sc.run()
+    sc.run(photon_energies=np.logspace(1,3,10))
+
+
+    sc.plot_photons_and_electrons()
