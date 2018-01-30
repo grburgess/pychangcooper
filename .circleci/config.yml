@@ -74,5 +74,5 @@ test:
     - ./cc-test-reporter before-build
 
   post:
-    codecov
-#    - ./cc-test-reporter after-build --exit-code $EXIT_CODE
+
+    - ./cc-test-reporter after-build --exit-code $EXIT_CODE
