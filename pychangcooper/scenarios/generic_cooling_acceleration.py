@@ -1,4 +1,5 @@
 import numpy as np
+
 from pychangcooper.chang_cooper import ChangCooper
 
 
@@ -34,7 +35,6 @@ class GenericCoolingAcceleration(ChangCooper):
             store_progress)
 
     def _define_terms(self):
-
         self._dispersion_term = 0.5 * np.power(
             self._half_grid, self._acceleration_index) / self._t_acc
 
@@ -43,11 +43,9 @@ class GenericCoolingAcceleration(ChangCooper):
             self._cooling_index) - 2 * self._dispersion_term / self._half_grid
 
     def _t_cool(self, gamma):
-
         return 1. / (self._C0 * gamma)
 
     def _clean(self):
-
         idx_too_small = self._n_current < 1E-15
 
         self._n_current[idx_too_small] = 0.

@@ -1,7 +1,7 @@
 import numpy as np
 
-class TridiagonalSolver(object):
 
+class TridiagonalSolver(object):
     def __init__(self, a, b, c):
         """
         A tridiagonal solver for the equation:
@@ -28,10 +28,9 @@ class TridiagonalSolver(object):
         self._b = np.array(b)
         self._c = np.array(c)
 
-
         # if the a terms are all zero, we do not need the
         # forward sweep as a is already eliminated
-        
+
         self._a_non_zero = ~np.all(self._a == 0)
 
         # the 0th term of the c prime will always
@@ -40,10 +39,9 @@ class TridiagonalSolver(object):
 
         # this is basically the first step of the forward
         # sweep
-        
-        self._cprime = self._c/self._b
 
-        
+        self._cprime = self._c / self._b
+
     def _forward_sweep(self, d):
         """
         This is the forward sweep of the tridiagonal solver
@@ -55,22 +53,19 @@ class TridiagonalSolver(object):
         # if we need to forward sweep, we must set the remaining
         # terms. Otherwise, they are just ratios
 
-        
-        
+
+
         self._cprime = self._c / self._b
         self._dprime = d / self._b
 
         if self._a_non_zero:
 
             for i in range(1, self._n_grid_points):
+                b_minus_ac = self._b[i] - self._a[i] * self._cprime[i - 1]
 
-                b_minus_ac = self._b[i] - self._a[i]*self._cprime[i-1]
-                
                 self._cprime[i] = self._c[i] / b_minus_ac
-                
+
                 self._dprime[i] = (d[i] - self._a[i] * self._dprime[i - 1]) / b_minus_ac
-
-
 
     def _backwards_substitution(self):
         """
@@ -86,22 +81,18 @@ class TridiagonalSolver(object):
         # backwards step to the beginning
 
         for j in range(self._n_grid_points - 2, -1, -1):
-
             n_j_plus_1[
                 j] = self._dprime[j] - self._cprime[j] * n_j_plus_1[j + 1]
 
         return n_j_plus_1
 
-
-
-
     def solve(self, d_j):
         """
         
         """
-        
+
         self._forward_sweep(d_j)
 
         d_j_plus_one = self._backwards_substitution()
-        
+
         return d_j_plus_one
