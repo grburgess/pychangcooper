@@ -64,3 +64,40 @@ class SynchrotronEmission(object):
             self._gamma_grid[1:] - self._gamma_grid[:-1])).sum() / (2. * energy)
 
         return spectrum
+
+
+
+def synchrotron_cooling_constant(B):
+    """
+    Compute the characteristic cooling constant for synchrotron cooling
+
+    Define a factor that is dependent on the magnetic field B.
+    The cooling time of an electron at energy gamma is
+    DT = 6 * pi * me*c / (sigma_T B^2 gamma)
+    DT = (1.29234E-9 B^2 gamma)^-1 seconds
+    DT = (cool * gamma)^-1 seconds
+    where B is in Gauss.
+
+    """
+
+
+    bulk_gamma = 300.
+
+    const_factor = 1.29234E-9
+
+    C0 = const_factor * B**2
+
+    return C0
+
+
+def synchrotron_cooling_time(B, gamma):
+    """
+    Compute the characteristic cooling time of an electron of energy gamma
+    for a given magnetic field strength
+
+    """
+    # get the cooling constant
+    C0 = synchrotron_cooling_constant(B)
+
+    return 1. / (C0 * gamma)
+    
