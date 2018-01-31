@@ -3,7 +3,7 @@ import numpy as np
 
 from pychangcooper.chang_cooper import ChangCooper
 from pychangcooper.io.fill_plot import fill_plot_static
-from pychangcooper.synchrotron_emission import SynchrotronEmission
+from pychangcooper.photons.synchrotron_emission import SynchrotronEmission
 from pychangcooper.utils.progress_bar import progress_bar
 
 
