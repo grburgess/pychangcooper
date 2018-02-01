@@ -4,6 +4,31 @@ from pychangcooper.io.fill_plot import fill_plot_static
 from pychangcooper.tridiagonal_solver import TridiagonalSolver
 
 
+def log_grid_generator(n_steps, grid_max):
+    step = np.exp((1. / n_steps) * np.log(grid_max))
+    step_plus_one = step + 1.
+
+
+    # initialize all the grid points
+    grid = np.zeros(n_steps)
+
+    half_grid = np.zeros(n_steps - 1)
+
+
+    # now build the grid and the half grid points
+    # we also make squared terms just incase
+    for i in range(n_steps):
+
+        grid[i] = np.power(step, i)
+
+
+        if (i < n_steps - 1):
+            half_grid[i] = 0.5 * grid[i] * step_plus_one
+
+    return grid, half_grid, step
+
+
+
 class ChangCooper(object):
     def __init__(self,
                  n_grid_points=300,
@@ -59,28 +84,13 @@ class ChangCooper(object):
         setup the grid for the calculations and initialize the 
         solution
         """
+
         # logarithmic grid
-        step = np.exp((1. / self._n_grid_points) * np.log(self._max_grid))
-        step_plus_one = step + 1.
-        self._step = step
-
-        # initialize all the grid points
-        self._grid = np.zeros(self._n_grid_points)
-        self._grid2 = np.zeros(self._n_grid_points)
-        self._half_grid = np.zeros(self._n_grid_points - 1)
-        self._half_grid2 = np.zeros(self._n_grid_points - 1)
-
-        # now build the grid and the half grid points
-        # we also make squared terms just incase
-        for i in range(self._n_grid_points):
-
-            self._grid[i] = np.power(step, i)
-            self._grid2[i] = self._grid[i] * self._grid[i]
-
-            if (i < self._n_grid_points - 1):
-                self._half_grid[i] = 0.5 * self._grid[i] * step_plus_one
-                self._half_grid2[i] = self._half_grid[i] * self._half_grid[i]
-
+        
+        self._grid, self._half_grid, self._step = log_grid_generator(self._n_grid_points, self._max_grid)
+        self._grid2 = self._grid**2
+        self._half_grid2 = self._half_grid**2
+        
         # define the delta of the grid
 
         # we need to add extra end points to the grid
