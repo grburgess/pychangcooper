@@ -1,7 +1,8 @@
 import pytest
 import numpy as np
 
-from pychangcooper.scenarios.synchrotron_cooling import SynchrotronCooling
+from pychangcooper.scenarios.synchrotron_cooling import SynchrotronCooling_ContinuousPLInjection
+from pychangcooper.scenarios.synchrotron_cooling import SynchrotronCooling_ImpulsivePLInjection
 from pychangcooper.scenarios.generic_cooling_acceleration import GenericCoolingAcceleration
 
 def test_generic_cool_accel():
@@ -42,7 +43,7 @@ def test_generic_cool_accel():
 def test_synchrotron_cooling():
 
     
-    synch_cool = SynchrotronCooling(B=1E10,
+    synch_cool = SynchrotronCooling_ContinuousPLInjection(B=1E10,
                                     index=-3.5,
                                     gamma_injection=1E3,
                                     gamma_cool=500,
@@ -50,6 +51,20 @@ def test_synchrotron_cooling():
                                     store_progress=True)
 
     
+
+
+    synch_cool.run(photon_energies=np.logspace(1,7,50))
+
+    synch_cool.plot_photons_and_electrons(skip=20,alpha=.7,cmap='viridis');
+
+    synch_cool = SynchrotronCooling_ImpulsivePLInjection(B=1E10,
+                                index=-3.5,
+                                gamma_injection=1E3,
+                                gamma_cool=500,
+                                gamma_max=1E5,
+                                store_progress=True)
+
+
 
 
     synch_cool.run(photon_energies=np.logspace(1,7,50))
