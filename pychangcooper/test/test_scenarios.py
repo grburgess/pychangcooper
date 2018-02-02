@@ -3,7 +3,8 @@ import numpy as np
 
 from pychangcooper.scenarios.synchrotron_cooling import SynchrotronCooling_ContinuousPLInjection
 from pychangcooper.scenarios.synchrotron_cooling import SynchrotronCooling_ImpulsivePLInjection
-from pychangcooper.scenarios.generic_cooling_acceleration import GenericCoolingAcceleration
+from pychangcooper.scenarios.synchrotron_cooling_acceleration import SynchCoolAccel_ImpulsivePLInjection, SynchCoolAccel_ContinuousPLInjection
+from pychangcooper.scenarios.generic_cooling_acceleration import CoolingAcceleration
 
 def test_generic_cool_accel():
 
@@ -18,7 +19,7 @@ def test_generic_cool_accel():
         init_distribution[i+1] = 1.
 
 
-    generic_ca = GenericCoolingAcceleration(n_grid_points=n_grid_points,
+    generic_ca = CoolingAcceleration(n_grid_points=n_grid_points,
                                         C0 = 1.,
                                         t_acc= 1E-4,
                                         cooling_index=2.,
@@ -70,3 +71,37 @@ def test_synchrotron_cooling():
     synch_cool.run(photon_energies=np.logspace(1,7,50))
 
     synch_cool.plot_photons_and_electrons(skip=20,alpha=.7,cmap='viridis');
+
+
+def test_synchrotron_cooling_acceleration():
+
+    solver_mfc = SynchCoolAccel_ImpulsivePLInjection(n_grid_points=1000,
+                            B=5E9,
+                            gamma_injection=1E3,
+                            gamma_cool=1000.,
+                            index=-3.5,
+                            acceleration_index=2,
+                            t_acc_fraction=1.E2,
+                                                 
+                            store_progress=True,
+                            )
+
+    solver_mfc.run(photon_energies=np.logspace(1,7,100))
+
+    solver_mfc.plot_photons_and_electrons(skip=100);
+
+
+    solver_mfc = SynchCoolAccel_ContinuousPLInjection(n_grid_points=1000,
+                            B=5E9,
+                            gamma_injection=1E3,
+                            gamma_cool=1000.,
+                            index=-3.5,
+                            acceleration_index=2,
+                            t_acc_fraction=1.E2,
+                                                 
+                            store_progress=True,
+                            )
+
+    solver_mfc.run(photon_energies=np.logspace(1,7,100))
+
+    solver_mfc.plot_photons_and_electrons(skip=100);
