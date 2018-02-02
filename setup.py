@@ -7,6 +7,7 @@ setup(
         'pychangcooper',
         'pychangcooper/utils',
         'pychangcooper/scenarios',
+        'pychangcooper/photons'
 
     ],
     version='v1.1',
