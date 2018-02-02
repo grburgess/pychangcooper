@@ -1,13 +1,34 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pychangcooper.chang_cooper import ChangCooper
-from pychangcooper.io.fill_plot import fill_plot_static
-from pychangcooper.photons.synchrotron_emission import SynchrotronEmission
-from pychangcooper.utils.progress_bar import progress_bar
+from pychangcooper.chang_cooper import ChangCooper, log_grid_generator
 
 
-class SynchrotronCooling(ChangCooper):
+
+from pychangcooper.photons.synchrotron_emission import SynchrotronEmission, synchrotron_cooling_constant, synchrotron_cooling_time
+from pychangcooper.photons.photon_emitter import PhotonEmitter
+from pychangcooper.scenarios.generic_cooling_component import GenericCoolingComponent
+from pychangcooper.scenarios.continuous_powerlaw_injection import ContinuousPowerlawInjection
+
+
+
+
+
+class SynchrotronCoolingComponent(GenericCoolingComponent):
+
+    def __init__(self, B):
+        """
+        A synchrotron cooling component that implements the proper cooling terms
+        """
+
+        C0 = synchrotron_cooling_constant(B)
+
+
+        super(SynchrotronCoolingComponent, self).__init__(C0, 2.)
+
+
+
+class SynchrotronCooling_ImpulsivePLInjection(SynchrotronCoolingComponent, PhotonEmitter, ChangCooper):
     def __init__(self,
                  B=10.,
                  index=-2.2,
@@ -15,154 +36,68 @@ class SynchrotronCooling(ChangCooper):
                  gamma_cool=2E3,
                  gamma_max=1E5,
                  n_grid_points=300,
-                 max_gamma=1E5,
-                 initial_distribution=None,
+                 max_grid=1E7,
                  store_progress=False):
 
-        #     Define a factor that is dependent on the magnetic field B.
-        #     The cooling time of an electron at energy gamma is
-        #     DT = 6 * pi * me*c / (sigma_T B^2 gamma)
-        #     DT = (1.29234E-9 B^2 gamma)^-1 seconds
-        #     DT = (cool * gamma)^-1 seconds
-        #     where B is in Gauss.
+
+
+        self._B = B
 
         bulk_gamma = 300.
-        const_factor = 1.29234E-9
-        self._B = B
-        sync_cool = 1. / (B * B * const_factor)
+
 
         ratio = gamma_max / gamma_cool
 
-        self._steps = np.round(ratio)
+        n_steps = np.round(ratio)
 
         self._gamma_max = gamma_max
         self._gamma_cool = gamma_cool
         self._gamma_injection = gamma_injection
-
         self._index = index
-        self._cool = 1.29234E-9 * B * B
 
-        delta_t = sync_cool / (gamma_max)
+        
+        initial_distribution = np.zeros(n_grid_points)
+        tmp_grid, _, _ = log_grid_generator(n_grid_points,max_grid)
+        
+        
+        idx = (gamma_injection <= tmp_grid) & (tmp_grid <= gamma_max)
 
-        super(SynchrotronCooling,
-              self).__init__(n_grid_points, max_gamma, delta_t,
+        norm = (np.power(gamma_max, index+1) - np.power(gamma_injection, index+1)) /(index + 1 )
+
+        
+        initial_distribution[idx] = 1. * norm  *np.power(tmp_grid[idx], index)
+
+
+        delta_t = synchrotron_cooling_time(B, gamma_max)
+
+
+        
+
+        SynchrotronCoolingComponent.__init__(self, B)
+                
+
+        ChangCooper.__init__(self, n_grid_points, max_grid, delta_t,
                              initial_distribution, store_progress)
 
-    def _define_terms(self):
 
-        self._dispersion_term = np.zeros(self._n_grid_points)
-
-        self._heating_term = self._cool * self._half_grid2
-
-    def _source_function(self, energy):
-        """
-        power law injection
-        """
-
-        out = np.zeros(self._n_grid_points)
-
-        idx = (self._gamma_injection <= self._grid) & (self._grid <=
-                                                       self._gamma_max)
-
-        out[idx] = np.power(self._grid[idx], self._index)
-        return out
-
-    def run(self, photon_energies=None):
-
-        with progress_bar(int(self._steps), title='cooling electrons') as p:
-            for i in range(int(self._steps)):
-                self.solve_time_step()
-
-                p.increase()
-
-        if photon_energies is not None:
-            self._compute_synchrotron_spectrum(photon_energies)
-
-            self._photon_energies = photon_energies
-
-    def _clean(self):
-
-        lower_bound = min(self._gamma_cool, self._gamma_injection)
-
-        idx = self._grid <= lower_bound
-
-        self._n_current[idx] = 0.
-
-    def _compute_synchrotron_spectrum(self, photon_energies):
-        """
-
-        """
-
-        synchrotron_emitter = SynchrotronEmission(B=self._B,
-                                                  photon_energies=photon_energies,
-                                                  gamma_grid=self._grid
-                                                  )
-
-        self._all_spectra = []
-
-        with progress_bar(int(self._steps), title='computing spectrum') as p:
-            for electrons in self.history:
-                self._all_spectra.append(synchrotron_emitter.compute_spectrum(electrons))
-
-                p.increase()
-
-        self._all_spectra = np.array(self._all_spectra)
-
-        self._total_spectrum = self._all_spectra.sum(axis=0)
-
-    @property
-    def final_spectrum(self):
-
-        return self._total_spectrum
-
-    @property
-    def photon_energies(self):
-
-        return self._photon_energies
-
-    def plot_emission(self, cmap='viridis', skip=1, alpha=0.5, ax=None, animate=False):
-
-        cumulative_spectrum = (self._all_spectra.cumsum(axis=0))[::skip]
-
-        if not animate:
-
-            fig = fill_plot_static(self._photon_energies, self._photon_energies ** 2 * cumulative_spectrum, cmap, alpha,
-                                   ax)
-
-        else:
-
-            fig = fill_plot_animated(self._photon_energies, self._photon_energies ** 2 * cumulative_spectrum, cmap,
-                                     alpha, ax)
-
-        if ax is None:
-            ax = fig.get_axes()[0]
-
-        ax.set_xscale('log')
-        ax.set_yscale('log')
-
-        ax.set_xlabel('Energy')
-        ax.set_ylabel(r'$\nu F_{\nu}$')
-
-        return fig
-
-    def plot_photons_and_electrons(self, cmap='viridis', skip=1, alpha=0.5):
-
-        fig, (ax1, ax2) = plt.subplots(1, 2)
-
-        _ = self.plot_evolution(cmap=cmap, skip=skip, ax=ax1, alpha=alpha)
-        _ = self.plot_emission(cmap=cmap, skip=skip, ax=ax2, alpha=alpha)
-        ax2.yaxis.tick_right()
-        ax2.yaxis.set_label_position("right")
-
-        ax1.set_xlim(left=min(self._gamma_cool, self._gamma_injection) * .5)
-
-        fig.tight_layout()
-        fig.subplots_adjust(hspace=0, wspace=0)
-
-        return fig
+        emission_kernel = SynchrotronEmission(self._grid, self._B)
 
 
-class SynchrotronCoolingWithEscape(SynchrotronCooling):
+        PhotonEmitter.__init__(self, n_steps, emission_kernel)
+
+#     def _clean(self):
+
+# #        lower_bound = min(self._gamma_cool, self._gamma_injection)
+
+#         lower_bound = self._gamma_cool
+        
+#         idx = self._grid <= lower_bound
+
+#         self._n_current[idx] = 0.
+
+        
+        
+class SynchrotronCooling_ContinuousPLInjection(SynchrotronCoolingComponent, ContinuousPowerlawInjection, PhotonEmitter, ChangCooper):
     def __init__(self,
                  B=10.,
                  index=-2.2,
@@ -170,17 +105,53 @@ class SynchrotronCoolingWithEscape(SynchrotronCooling):
                  gamma_cool=2E3,
                  gamma_max=1E5,
                  n_grid_points=300,
-                 max_gamma=1E5,
-                 t_esc=1.,
-                 initial_distribution=None,
+                 max_grid=1E7,
                  store_progress=False):
-        self._t_esc = t_esc
 
-        super(SynchrotronCoolingWithEscape, self).__init__(B, index, gamma_injection, gamma_cool, gamma_max,
-                                                           n_grid_points, max_gamma, initial_distribution,
-                                                           store_progress)
 
-    def _escape_function(self, energy):
-        print('here')
 
-        return 1. / self._t_esc
+        self._B = B
+
+        bulk_gamma = 300.
+
+
+        ratio = gamma_max / gamma_cool
+
+        n_steps = np.round(ratio)
+
+        self._gamma_max = gamma_max
+        self._gamma_cool = gamma_cool
+        self._gamma_injection = gamma_injection
+        self._index = index
+
+
+        delta_t = synchrotron_cooling_time(B, gamma_max)
+
+        SynchrotronCoolingComponent.__init__(self, B)
+        ContinuousPowerlawInjection.__init__(self, gamma_injection, gamma_max, index, N=1.)
+        
+
+        ChangCooper.__init__(self, n_grid_points, max_grid, delta_t,
+                             None, store_progress)
+
+
+        
+        emission_kernel = SynchrotronEmission(self._grid, self._B)
+
+
+        PhotonEmitter.__init__(self, n_steps, emission_kernel)
+
+
+
+
+#     def _clean(self):
+
+# #        lower_bound = min(self._gamma_cool, self._gamma_injection)
+
+#         lower_bound = self._gamma_cool
+        
+#         idx = self._grid <= lower_bound
+
+#         self._n_current[idx] = 0.
+
+
