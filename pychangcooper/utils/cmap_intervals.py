@@ -47,7 +47,7 @@ def cmap_intervals(length=50, cmap='YlOrBr', start=None, stop=None):
     successive lines because successive colors are very similar.
     :param cmap: str name of a matplotlib colormap (see matplotlib.pyplot.cm)
     """
-    cm = getattr(plt.cm, cmap)
+
 
 
     
@@ -59,6 +59,8 @@ def cmap_intervals(length=50, cmap='YlOrBr', start=None, stop=None):
                              'Vega20', 'Vega20b', 'Vega20c']:
 
 
+        cm = getattr(plt.cm, cmap)
+        
         base_n_colors = cm.N
 
         cmap_list = cm(range(base_n_colors))
@@ -74,23 +76,33 @@ def cmap_intervals(length=50, cmap='YlOrBr', start=None, stop=None):
 
         return cmap_list
 
-    elif cmap in _alt_cmaps:
+    elif cmap in _alt_cmaps.keys():
 
         this_cmap = _alt_cmaps[cmap]
 
-        if len(this_cmap) <= length:
+        if len(this_cmap) >= length:
 
-            return this_cmap[:length]
-    
+            return this_cmap
 
-    crange = CMAP_RANGE.get(cmap, dict(start=0, stop=255))
-    if cmap in REVERSE_CMAP:
-        crange = dict(start=crange['stop'], stop=crange['start'])
-    if start is not None:
-        crange['start'] = start
-    if stop is not None:
-        crange['stop'] = stop
+        else:
+
+            raise RuntimeError('CMAP is too short %d<%d'%(len(this_cmap), length))
 
 
-    idx = np.linspace(crange['start'], crange['stop'], length).astype(np.int)
-    return cm(idx)
+
+            
+    else:
+
+        cm = getattr(plt.cm, cmap)
+        
+        crange = CMAP_RANGE.get(cmap, dict(start=0, stop=255))
+        if cmap in REVERSE_CMAP:
+            crange = dict(start=crange['stop'], stop=crange['start'])
+        if start is not None:
+            crange['start'] = start
+        if stop is not None:
+            crange['stop'] = stop
+
+
+        idx = np.linspace(crange['start'], crange['stop'], length).astype(np.int)
+        return cm(idx)
