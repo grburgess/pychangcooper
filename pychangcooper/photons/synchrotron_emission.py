@@ -1,5 +1,9 @@
 import numpy as np
 
+from pychangcooper.photons.emission_kernel import EmissionKernel
+
+
+
 try:
     from pygsl.testing.sf import synchrotron_1
 
@@ -10,8 +14,8 @@ except(ImportError):
     has_gsl = False
 
 
-class SynchrotronEmission(object):
-    def __init__(self, photon_energies, gamma_grid, B):
+class SynchrotronEmission(EmissionKernel):
+    def __init__(self, gamma_grid, B):
         """
         :param photon_energies: the photon energies
         :param gamma_grid: the electron gamma grid
@@ -19,14 +23,24 @@ class SynchrotronEmission(object):
         """
 
         self._B = B
-        self._photon_energies = photon_energies
         self._gamma_grid = gamma_grid
+        self._n_grid_points = len(gamma_grid)
 
-        self._n_photon_energies = len(self._photon_energies)
-        self._n_grid_points = len(self._gamma_grid)
+        
+        super(SynchrotronEmission, self).__init__()
 
+        
+    def set_photon_energies(self, photon_energies):
+        """
+        Set the photon energies and build the synchrotron kernel
+        """
+
+        super(SynchrotronEmission, self).set_photon_energies(photon_energies)
+        
         if has_gsl:
+
             self._build_synchrotron_kernel()
+            
         else:
 
             # this is a dummy for testing
@@ -35,6 +49,8 @@ class SynchrotronEmission(object):
 
             RuntimeWarning('There is no GSL, cannot compute')
 
+        
+            
     def _build_synchrotron_kernel(self):
         """
         pre build the synchrotron kernel for the integration
@@ -59,6 +75,8 @@ class SynchrotronEmission(object):
 
         spectrum = np.zeros_like(self._photon_energies)
 
+        # convolve the synchrotron kernel with the electron
+        # distribution
         for i, energy in enumerate(self._photon_energies):
             spectrum[i] = (self._synchrotron_kernel[i, 1:] * electron_distribution[1:] * (
             self._gamma_grid[1:] - self._gamma_grid[:-1])).sum() / (2. * energy)
