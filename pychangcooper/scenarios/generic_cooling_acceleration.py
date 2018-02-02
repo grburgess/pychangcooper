@@ -46,6 +46,13 @@ class GenericCoolingAcceleration(object):
 
         return self._t_acc
 
+    @property
+    def equilbrium_energy(self):
+        """
+        The equilibrium energy of the electrons
+        """
+
+        return 1./(self._C0 * self._t_acc)
 
 
 
