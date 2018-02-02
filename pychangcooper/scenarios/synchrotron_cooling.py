@@ -85,18 +85,7 @@ class SynchrotronCooling_ImpulsivePLInjection(SynchrotronCoolingComponent, Photo
 
         PhotonEmitter.__init__(self, n_steps, emission_kernel)
 
-#     def _clean(self):
-
-# #        lower_bound = min(self._gamma_cool, self._gamma_injection)
-
-#         lower_bound = self._gamma_cool
-        
-#         idx = self._grid <= lower_bound
-
-#         self._n_current[idx] = 0.
-
-        
-        
+            
 class SynchrotronCooling_ContinuousPLInjection(SynchrotronCoolingComponent, ContinuousPowerlawInjection, PhotonEmitter, ChangCooper):
     def __init__(self,
                  B=10.,
