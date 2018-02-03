@@ -58,12 +58,17 @@ def test_synchrotron_cooling():
 
     synch_cool.plot_photons_and_electrons(skip=20,alpha=.7,cmap='viridis');
 
+
+    synch_cool.plot_final_emission()
+
+    
     synch_cool = SynchrotronCooling_ImpulsivePLInjection(B=1E10,
                                 index=-3.5,
                                 gamma_injection=1E3,
                                 gamma_cool=500,
                                 gamma_max=1E5,
                                 store_progress=True)
+
 
 
 
