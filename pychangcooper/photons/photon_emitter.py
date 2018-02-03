@@ -58,7 +58,7 @@ class PhotonEmitter(object):
         return self._emission_kernel.photon_energies
 
 
-    def plot_final_emission(self, ax=None, **kwargs):
+    def plot_final_emission(self, ax=None, x_scaling=1., y_scaling=1., **kwargs):
 
         assert self.photon_energies is not None, "There are no photons!"
 
@@ -71,7 +71,7 @@ class PhotonEmitter(object):
             fig = ax.get_figure()
 
 
-        ax.loglog(self.photon_energies, self.photon_energies**2, self.final_spectrum, **kwargs)
+        ax.loglog(self.photon_energies * x_scaling, self.photon_energies**2 * self.final_spectrum * y_scaling, **kwargs)
 
         ax.set_xlabel('Energy')
         ax.set_ylabel(r'$\nu F_{\nu}$')
@@ -94,7 +94,7 @@ class PhotonEmitter(object):
             fig = ax.get_figure()
 
 
-        ax.loglog(self.photon_energies, self.photon_energies**2, self.final_spectrum, **kwargs)
+        ax.loglog(self.photon_energies, self.photon_energies**2 * self._all_spectra[0], **kwargs)
 
         ax.set_xlabel('Energy')
         ax.set_ylabel(r'$\nu F_{\nu}$')
