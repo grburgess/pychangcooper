@@ -29,8 +29,7 @@ class DummyChildNoDispersion(ChangCooper):
 
 def test_chang_cooper_constructor():
 
-    # check that we cannot build the base class
-    with pytest.raises(AttributeError):
+    with pytest.raises(RuntimeError):
         pc = ChangCooper()
 
     grid_size = 10

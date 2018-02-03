@@ -3,7 +3,7 @@ import numpy as np
 from pychangcooper.chang_cooper import ChangCooper
 
 
-class GenericCoolingAcceleration(object):
+class GenericCoolingAccelerationComponent(object):
     def __init__(self,
                  C0=1.,
                  t_acc=1,
@@ -11,19 +11,21 @@ class GenericCoolingAcceleration(object):
                  acceleration_index=2):
                  
         """
-        Gerneric cooling and acceleration
-        :param C0:
-        :param t_acc:
-        :param cooling_index:
-        :param acceleration_index:
+        Generic cooling and acceleration component that must be co-inherited with 
+        ChangCooper to form a complete solution. This is to reduce code duplication
+        for similar problems
+        
+        
+        :param C0: the cooling constant
+        :param t_acc: the acceleration time
+        :param cooling_index: the cooling index
+        :param acceleration_index: the acceleeration index
         """
 
         self._C0 = C0
         self._t_acc = t_acc
         self._cooling_index = cooling_index
         self._acceleration_index = acceleration_index
-
-        
 
 
 
@@ -37,6 +39,11 @@ class GenericCoolingAcceleration(object):
 
         
     def _t_cool(self, gamma):
+        """
+        calculate the cooling time of a particle with energy gamma
+        :param gamma: the energy of the particle
+        :return: 
+        """
         return 1. / (self._C0 * gamma)
 
 
@@ -56,7 +63,7 @@ class GenericCoolingAcceleration(object):
 
 
 
-class CoolingAcceleration(GenericCoolingAcceleration, ChangCooper):
+class CoolingAcceleration(GenericCoolingAccelerationComponent, ChangCooper):
     def __init__(self,
                  n_grid_points=300,
                  C0=1.,
@@ -66,66 +73,31 @@ class CoolingAcceleration(GenericCoolingAcceleration, ChangCooper):
                  max_grid=1E7,
                  store_progress=False,
                  initial_distribution=None):
+        """
+        Cooling and acceleration of an unspecified form. 
+        
+        
+        :param n_grid_points: number of grid points 
+        :param C0: the cooling constant
+        :param t_acc: the acceleration time
+        :param cooling_index: the index of the cooling term
+        :param acceleration_index: the index of the acceleration term
+        :param max_grid: the maximum grid energy
+        :param store_progress: to store the progress of the evolution
+        :param initial_distribution: the initial distribution of the electrons
+        """
                  
-        """
-        Gerneric cooling and acceleration
-        :param C0:
-        :param t_acc:
-        :param cooling_index:
-        :param acceleration_index:
-        """
 
-        GenericCoolingAcceleration.__init__(self, C0, t_acc, cooling_index, acceleration_index)
 
+        # first call the cool-accel component constructor to setup the terms and special
+        # properties
+
+        GenericCoolingAccelerationComponent.__init__(self, C0, t_acc, cooling_index, acceleration_index)
+
+
+        # figure out the delta t
         delta_t = self._get_min_timescale()
 
         ChangCooper.__init__(self, n_grid_points, max_grid, delta_t, initial_distribution, store_progress)
 
 
-
-# class GenericCoolingAcceleration(ChangCooper):
-#     def __init__(self,
-#                  n_grid_points=300,
-#                  C0=1.,
-#                  t_acc=1,
-#                  cooling_index=-2,
-#                  acceleration_index=2,
-#                  max_grid=1E7,
-#                  initial_distribution=None,
-#                  store_progress=False):
-#         """
-#         Gerneric cooling and acceleration
-#         :param n_grid_points:
-#         :param C0:
-#         :param t_acc:
-#         :param cooling_index:
-#         :param acceleration_index:
-#         :param max_grid:
-#         """
-
-#         self._C0 = C0
-#         self._t_acc = t_acc
-#         self._cooling_index = cooling_index
-#         self._acceleration_index = acceleration_index
-
-#         delta_t = self._t_acc
-
-#         super(GenericCoolingAcceleration, self).__init__(
-#             n_grid_points, max_grid, delta_t, initial_distribution,
-#             store_progress)
-
-#     def _define_terms(self):
-#         self._dispersion_term = 0.5 * np.power(
-#             self._half_grid, self._acceleration_index) / self._t_acc
-
-#         self._heating_term = self._C0 * np.power(
-#             self._half_grid,
-#             self._cooling_index) - 2 * self._dispersion_term / self._half_grid
-
-#     def _t_cool(self, gamma):
-#         return 1. / (self._C0 * gamma)
-
-#     def _clean(self):
-#         idx_too_small = self._n_current < 1E-15
-
-#         self._n_current[idx_too_small] = 0.

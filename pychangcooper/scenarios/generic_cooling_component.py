@@ -1,11 +1,16 @@
 import numpy as np
 
-from pychangcooper.chang_cooper import ChangCooper
-
 
 class GenericCoolingComponent(object):
 
     def __init__(self, C0, cooling_index):
+        """
+        A generic cooling component that must be co-inherited with
+        ChangCooper to produce a cooling only solution
+        
+        :param C0: the cooling constant
+        :param cooling_index: the cooling index
+        """
 
         self._cooling_index = cooling_index
         self._C0 = C0

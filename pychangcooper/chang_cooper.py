@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 from pychangcooper.io.fill_plot import fill_plot_static
 from pychangcooper.tridiagonal_solver import TridiagonalSolver
@@ -42,9 +43,15 @@ class ChangCooper(object):
 
         :param n_grid_points: number of grid points on the x-axis
         :param max_grid: the maximum energy of the grid
+        :param delta_t: the time step in the equation
+        :param initial_distribution: an array of an initial electron distribution
+        :param store_progress: store the history of the runs
         """
 
         self._n_grid_points = n_grid_points
+        self._dispersion_term = np.zeros(n_grid_points)
+        self._heating_term = np.zeros(n_grid_points)
+
         self._max_grid = max_grid
         self._delta_t = delta_t
         self._iterations = 0
@@ -59,12 +66,14 @@ class ChangCooper(object):
 
             # initalize the grid of electrons
             self._n_current = np.zeros(self._n_grid_points)
+            self._initial_distribution = np.zeros(n_grid_points)
 
         else:
 
             assert len(initial_distribution) == self._n_grid_points
 
             self._n_current = np.array(initial_distribution)
+            self._initial_distribution = initial_distribution
 
         # define the heating and dispersion terms
         # must be implemented in the subclasses
@@ -126,8 +135,6 @@ class ChangCooper(object):
 
         self._delta_j = np.zeros(self._n_grid_points - 1)
 
-        # if the dispersion term is 0, then we  need a centered difference
-        idx_dispersion_non_zero = self._dispersion_term != 0
 
         for j in range(self._n_grid_points - 1):
 
@@ -311,7 +318,7 @@ class ChangCooper(object):
 
     def _define_terms(self):
 
-        RuntimeError('Must be implemented in subclass')
+        raise RuntimeError('Must be implemented in subclass')
 
     def solve_time_step(self):
         """
@@ -416,16 +423,91 @@ class ChangCooper(object):
 
         return np.array(self._saved_grids)
 
+
+    def reset(self):
+        """
+        reset the solver to the initial electron distribution
+        
+        :return: 
+        """
+
+        self._n_current = self._initial_distribution
+        self._iterations = 0
+        self._current_time = 0.
+
+
+    def plot_current_distribution(self, ax=None, **kwargs ):
+
+        if ax is None:
+
+            fig, ax = plt.subplots()
+
+            ax.set_xlabel(r'$\gamma$')
+            ax.set_ylabel(r'$N(\gamma, t)$')
+
+            ax.set_xscale('log')
+            ax.set_yscale('log')
+
+        else:
+
+            fig = ax.get_figure()
+
+
+        ax.plot(self._grid, self._n_current,**kwargs)
+
+
+        return fig
+
+    def plot_initial_distribution(self, ax=None, **kwargs):
+        """
+        plot the initial distribution of the electrons
+        
+        :param ax: ax to plot to
+        :param kwargs: mpl kwargs
+        :return: fig
+        """
+
+        if ax is None:
+
+            fig, ax = plt.subplots()
+
+            ax.set_xlabel(r'$\gamma$')
+            ax.set_ylabel(r'$N(\gamma, t)$')
+
+            ax.set_xscale('log')
+            ax.set_yscale('log')
+
+        else:
+
+            fig = ax.get_figure()
+
+        ax.plot(self._grid, self._initial_distribution, **kwargs)
+
+        return fig
+
+
+
+
     def plot_evolution(self,
                        cmap='magma',
                        skip=1,
                        show_legend=False,
-                       alpha=.6,
+                       alpha=.9,
                        show_final=False,
                        show_initial=False,
                        ax=None):
         """
-        Plot the evolution of the spectra
+        plot th evolution of the electrons
+        
+        
+        :param cmap: cmap to use
+        :param skip: number of elements to skip
+        :param show_legend: show a legend
+        :param alpha: the transparency 
+        :param show_final: label the final solution
+        :param show_initial: show the initial distribution
+        :param ax: the ax to plot to
+        :return: 
         """
 
         solutions = self.history[::skip]
@@ -436,24 +518,22 @@ class ChangCooper(object):
             ax = fig.get_axes()[0]
 
         if show_final:
-            ax.plot(self._grid,
-                    self._n_current,
-                    color='k',
-                    ls='--',
-                    zorder=len(solutions) + 1,
-                    alpha=1,
-                    label='final solution'
-                    )
+           _ = self.plot_current_distribution(ax,
+                                              color='k',
+                                              ls='--',
+                                              zorder=len(solutions) + 1,
+                                              alpha=1,
+                                              label='final distribution'
+                                              )
 
         if show_initial:
-            ax.plot(self._grid,
-                    self.history[0],
-                    color='k',
-                    ls=':',
-                    zorder=len(solutions) + 1,
-                    alpha=1,
-                    label='initial solution'
-                    )
+            _ = self.plot_initial_distribution(ax,
+                                               color='k',
+                                               ls=':',
+                                               zorder=len(solutions) + 1,
+                                               alpha=1,
+                                               label='initial distribution'
+                                               )
 
         ax.set_xscale('log')
         ax.set_yscale('log')
