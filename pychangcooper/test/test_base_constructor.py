@@ -99,3 +99,7 @@ def test_history():
     assert np.all(save_n2 == dummy.history[1])
 
     dummy.plot_evolution()
+
+    dummy.plot_current_distribution()
+
+    dummy.plot_initial_distribution()
