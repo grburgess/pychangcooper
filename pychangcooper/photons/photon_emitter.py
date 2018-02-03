@@ -57,8 +57,56 @@ class PhotonEmitter(object):
 
         return self._emission_kernel.photon_energies
 
+
+    def plot_final_emission(self, ax=None, **kwargs):
+
+        assert self.photon_energies is not None, "There are no photons!"
+
+        if ax is None:
+
+            fig, ax = plt.subplots()
+
+        else:
+
+            fig = ax.get_figure()
+
+
+        ax.loglog(self.photon_energies, self.photon_energies**2, self.final_spectrum, **kwargs)
+
+        ax.set_xlabel('Energy')
+        ax.set_ylabel(r'$\nu F_{\nu}$')
+
+        return fig
+
+    def plot_initial_emission(self, ax=None, **kwargs):
+
+        assert self.photon_energies is not None, "There are no photons!"
+        assert np.all(self._all_spectra[0] > 0.), 'There are no photons to start!'
+
+        
+
+        if ax is None:
+
+            fig, ax = plt.subplots()
+
+        else:
+
+            fig = ax.get_figure()
+
+
+        ax.loglog(self.photon_energies, self.photon_energies**2, self.final_spectrum, **kwargs)
+
+        ax.set_xlabel('Energy')
+        ax.set_ylabel(r'$\nu F_{\nu}$')
+
+        return fig
+
+        
+
+    
     def plot_emission(self, cmap='viridis', skip=1, alpha=0.5, ax=None):
 
+        assert self.photon_energies is not None, "There are no photons!"
         cumulative_spectrum = (self._all_spectra.cumsum(axis=0))[::skip]
 
 
