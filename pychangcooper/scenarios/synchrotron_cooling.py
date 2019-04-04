@@ -2,9 +2,14 @@ import numpy as np
 
 from pychangcooper.chang_cooper import ChangCooper, log_grid_generator
 from pychangcooper.photons.photon_emitter import PhotonEmitter
-from pychangcooper.photons.synchrotron_emission import SynchrotronEmission, synchrotron_cooling_constant, \
-    synchrotron_cooling_time
-from pychangcooper.scenarios.continuous_powerlaw_injection import ContinuousPowerlawInjection
+from pychangcooper.photons.synchrotron_emission import (
+    SynchrotronEmission,
+    synchrotron_cooling_constant,
+    synchrotron_cooling_time,
+)
+from pychangcooper.scenarios.continuous_powerlaw_injection import (
+    ContinuousPowerlawInjection,
+)
 from pychangcooper.scenarios.generic_cooling_component import GenericCoolingComponent
 
 
@@ -19,19 +24,23 @@ class SynchrotronCoolingComponent(GenericCoolingComponent):
 
         C0 = synchrotron_cooling_constant(B)
 
-        super(SynchrotronCoolingComponent, self).__init__(C0, 2.)
+        super(SynchrotronCoolingComponent, self).__init__(C0, 2.0)
 
 
-class SynchrotronCooling_ImpulsivePLInjection(SynchrotronCoolingComponent, PhotonEmitter, ChangCooper):
-    def __init__(self,
-                 B=10.,
-                 index=-2.2,
-                 gamma_injection=1E3,
-                 gamma_cool=2E3,
-                 gamma_max=1E5,
-                 n_grid_points=300,
-                 max_grid=1E7,
-                 store_progress=False):
+class SynchrotronCooling_ImpulsivePLInjection(
+    SynchrotronCoolingComponent, PhotonEmitter, ChangCooper
+):
+    def __init__(
+        self,
+        B=10.0,
+        index=-2.2,
+        gamma_injection=1e3,
+        gamma_cool=2e3,
+        gamma_max=1e5,
+        n_grid_points=300,
+        max_grid=1e7,
+        store_progress=False,
+    ):
         """
         Synchrotron cooling and radiation from an impulsive power law injection of particles.
         
@@ -47,7 +56,7 @@ class SynchrotronCooling_ImpulsivePLInjection(SynchrotronCoolingComponent, Photo
 
         self._B = B
 
-        bulk_gamma = 300.
+        bulk_gamma = 300.0
 
         # calculate the number of steps to cool the maximum
         # electron energy to gamma cool
@@ -72,9 +81,11 @@ class SynchrotronCooling_ImpulsivePLInjection(SynchrotronCoolingComponent, Photo
 
         # normalize the electrons so that N = number of electrons
 
-        norm = (np.power(gamma_max, index + 1) - np.power(gamma_injection, index + 1)) / (index + 1)
+        norm = (
+            np.power(gamma_max, index + 1) - np.power(gamma_injection, index + 1)
+        ) / (index + 1)
 
-        initial_distribution[idx] = 1. * norm * np.power(tmp_grid[idx], index)
+        initial_distribution[idx] = 1.0 * norm * np.power(tmp_grid[idx], index)
 
         # set the time step to be that of the cooling time of
         # the most energetic electrons
@@ -87,8 +98,9 @@ class SynchrotronCooling_ImpulsivePLInjection(SynchrotronCoolingComponent, Photo
 
         # build the solver
 
-        ChangCooper.__init__(self, n_grid_points, max_grid, delta_t,
-                             initial_distribution, store_progress)
+        ChangCooper.__init__(
+            self, n_grid_points, max_grid, delta_t, initial_distribution, store_progress
+        )
 
         # create the emission kernel for producing radiation
 
@@ -99,17 +111,20 @@ class SynchrotronCooling_ImpulsivePLInjection(SynchrotronCoolingComponent, Photo
         PhotonEmitter.__init__(self, n_steps, emission_kernel)
 
 
-class SynchrotronCooling_ContinuousPLInjection(SynchrotronCoolingComponent, ContinuousPowerlawInjection, PhotonEmitter,
-                                               ChangCooper):
-    def __init__(self,
-                 B=10.,
-                 index=-2.2,
-                 gamma_injection=1E3,
-                 gamma_cool=2E3,
-                 gamma_max=1E5,
-                 n_grid_points=300,
-                 max_grid=1E7,
-                 store_progress=False):
+class SynchrotronCooling_ContinuousPLInjection(
+    SynchrotronCoolingComponent, ContinuousPowerlawInjection, PhotonEmitter, ChangCooper
+):
+    def __init__(
+        self,
+        B=10.0,
+        index=-2.2,
+        gamma_injection=1e3,
+        gamma_cool=2e3,
+        gamma_max=1e5,
+        n_grid_points=300,
+        max_grid=1e7,
+        store_progress=False,
+    ):
         """
         Synchrotron cooling and radiation from continuous power law injection of particles.
         
@@ -125,7 +140,7 @@ class SynchrotronCooling_ContinuousPLInjection(SynchrotronCoolingComponent, Cont
 
         self._B = B
 
-        bulk_gamma = 300.
+        bulk_gamma = 300.0
 
         # calculate the number of steps to cool the maximum
         # electron energy to gamma cool
@@ -150,28 +165,20 @@ class SynchrotronCooling_ContinuousPLInjection(SynchrotronCoolingComponent, Cont
         SynchrotronCoolingComponent.__init__(self, B)
 
         # create the injection
-        ContinuousPowerlawInjection.__init__(self, gamma_injection, gamma_max, index, N=1.)
+        ContinuousPowerlawInjection.__init__(
+            self, gamma_injection, gamma_max, index, N=1.0
+        )
 
         # build the solver
 
-        ChangCooper.__init__(self, n_grid_points, max_grid, delta_t,
-                             None, store_progress)
+        ChangCooper.__init__(
+            self, n_grid_points, max_grid, delta_t, None, store_progress
+        )
 
         # build the synchrotron emission kernel
-
 
         emission_kernel = SynchrotronEmission(self._grid, self._B)
 
         # initialize the photon emission process
 
         PhotonEmitter.__init__(self, n_steps, emission_kernel)
-
-# def _clean(self):
-
-# #        lower_bound = min(self._gamma_cool, self._gamma_injection)
-
-#         lower_bound = self._gamma_cool
-
-#         idx = self._grid <= lower_bound
-
-#         self._n_current[idx] = 0.

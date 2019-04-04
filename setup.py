@@ -1,24 +1,21 @@
-#from setuptools import setup
+# from setuptools import setup
 from distutils.core import setup
-setup(
 
+setup(
     name="pychangcooper",
     packages=[
-        'pychangcooper',
-        'pychangcooper/utils',
-        'pychangcooper/scenarios',
-        'pychangcooper/photons'
-
+        "pychangcooper",
+        "pychangcooper/io",
+        "pychangcooper/utils",
+        "pychangcooper/scenarios",
+        "pychangcooper/photons",
     ],
-    version='v1.1',
-    license='GPL',
-    description='A generic chang and cooper solver for fokker-planck equations',
-    author='J. Michael Burgess',
-    author_email='jmichaelburgess@gmail.com',
-    url = 'https://github.com/grburgess/pychangcooper',
-    download_url='https://github.com/grburgess/pychangcooper/archive/1.1.2.tar.gz',
-    requires=[
-        'numpy',
-        'matplotlib'
-    ],
+    version="v1.1",
+    license="GPL",
+    description="A generic chang and cooper solver for fokker-planck equations",
+    author="J. Michael Burgess",
+    author_email="jmichaelburgess@gmail.com",
+    url="https://github.com/grburgess/pychangcooper",
+    download_url="https://github.com/grburgess/pychangcooper/archive/1.1.2.tar.gz",
+    requires=["numpy", "matplotlib"],
 )

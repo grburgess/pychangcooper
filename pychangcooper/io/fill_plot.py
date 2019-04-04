@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 
 from pychangcooper.utils.cmap_intervals import cmap_intervals
 
-def fill_plot_static(x, y_values, cmap='viridis', alpha=1., ax=None ):
+
+def fill_plot_static(x, y_values, cmap="viridis", alpha=1.0, ax=None):
     """
     
     plot all the y values 
@@ -28,7 +29,6 @@ def fill_plot_static(x, y_values, cmap='viridis', alpha=1., ax=None ):
 
     colors = cmap_intervals(len(y_values), cmap)
 
-
     # keep figures up front
 
     zorder = len(y_values) + 10
@@ -46,7 +46,7 @@ def fill_plot_static(x, y_values, cmap='viridis', alpha=1., ax=None ):
     return fig
 
 
-def plot_time_step(iteration, x, y_values,color, zorder, alpha, ax):
+def plot_time_step(iteration, x, y_values, color, zorder, alpha, ax):
     """
     plot an individual time step with a filled plot
     
@@ -64,19 +64,22 @@ def plot_time_step(iteration, x, y_values,color, zorder, alpha, ax):
 
     if iteration == 0:
 
-        ax.plot(x, y_values[iteration], alpha=alpha, zorder=zorder,color=color)
+        ax.plot(x, y_values[iteration], alpha=alpha, zorder=zorder, color=color)
 
     # don't fill to zero if there is nothing to plot
 
-    elif np.all(y_values[iteration-1] == 0.):
+    elif np.all(y_values[iteration - 1] == 0.0):
 
-        ax.plot(x, y_values[iteration], alpha=alpha, zorder=zorder,color=color)
+        ax.plot(x, y_values[iteration], alpha=alpha, zorder=zorder, color=color)
 
     # fill between this iteration and the last
     else:
 
-        ax.fill_between(x, y_values[iteration-1], y_values[iteration], alpha=alpha, zorder=zorder,color=color)
-        
-
-    
-        
+        ax.fill_between(
+            x,
+            y_values[iteration - 1],
+            y_values[iteration],
+            alpha=alpha,
+            zorder=zorder,
+            color=color,
+        )
