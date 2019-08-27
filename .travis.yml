@@ -11,4 +11,4 @@ env:
 
 script:
   - python -m pytest -vv --cov=pychangcooper/
- # - codecov --token=2adee64a-60b0-4c7e-b94c-512ea2b8e794
+  - codecov --token=f0e77d6f-9305-493f-a0c3-c3aeed9ad680
