@@ -4,20 +4,17 @@ import matplotlib.pyplot as plt
 from pychangcooper.utils.progress_bar import progress_bar
 from pychangcooper.io.fill_plot import fill_plot_static
 
+
 class PhotonEmitter(object):
-
-
     def __init__(self, n_steps, emission_kernel):
 
         self._n_steps = n_steps
 
         self._emission_kernel = emission_kernel
 
-
-
     def run(self, photon_energies=None):
 
-        with progress_bar(int(self._n_steps), title='solving electrons electrons') as p:
+        with progress_bar(int(self._n_steps), title="solving electrons electrons") as p:
             for i in range(int(self._n_steps)):
                 self.solve_time_step()
 
@@ -26,7 +23,6 @@ class PhotonEmitter(object):
         if photon_energies is not None:
 
             self._compute_spectrum(photon_energies)
-
 
     def _compute_spectrum(self, photon_energies):
         """
@@ -37,9 +33,11 @@ class PhotonEmitter(object):
 
         self._all_spectra = []
 
-        with progress_bar(int(self._n_steps), title='computing spectrum') as p:
+        with progress_bar(int(self._n_steps), title="computing spectrum") as p:
             for electrons in self.history:
-                self._all_spectra.append(self._emission_kernel.compute_spectrum(electrons))
+                self._all_spectra.append(
+                    self._emission_kernel.compute_spectrum(electrons)
+                )
 
                 p.increase()
 
@@ -57,8 +55,7 @@ class PhotonEmitter(object):
 
         return self._emission_kernel.photon_energies
 
-
-    def plot_final_emission(self, ax=None, x_scaling=1., y_scaling=1., **kwargs):
+    def plot_final_emission(self, ax=None, x_scaling=1.0, y_scaling=1.0, **kwargs):
 
         assert self.photon_energies is not None, "There are no photons!"
 
@@ -70,20 +67,21 @@ class PhotonEmitter(object):
 
             fig = ax.get_figure()
 
+        ax.loglog(
+            self.photon_energies * x_scaling,
+            self.photon_energies ** 2 * self.final_spectrum * y_scaling,
+            **kwargs
+        )
 
-        ax.loglog(self.photon_energies * x_scaling, self.photon_energies**2 * self.final_spectrum * y_scaling, **kwargs)
-
-        ax.set_xlabel('Energy')
-        ax.set_ylabel(r'$\nu F_{\nu}$')
+        ax.set_xlabel("Energy")
+        ax.set_ylabel(r"$\nu F_{\nu}$")
 
         return fig
 
     def plot_initial_emission(self, ax=None, **kwargs):
 
         assert self.photon_energies is not None, "There are no photons!"
-        assert np.all(self._all_spectra[0] > 0.), 'There are no photons to start!'
-
-        
+        assert np.all(self._all_spectra[0] > 0.0), "There are no photons to start!"
 
         if ax is None:
 
@@ -93,40 +91,42 @@ class PhotonEmitter(object):
 
             fig = ax.get_figure()
 
+        ax.loglog(
+            self.photon_energies,
+            self.photon_energies ** 2 * self._all_spectra[0],
+            **kwargs
+        )
 
-        ax.loglog(self.photon_energies, self.photon_energies**2 * self._all_spectra[0], **kwargs)
-
-        ax.set_xlabel('Energy')
-        ax.set_ylabel(r'$\nu F_{\nu}$')
+        ax.set_xlabel("Energy")
+        ax.set_ylabel(r"$\nu F_{\nu}$")
 
         return fig
 
-        
-
-    
-    def plot_emission(self, cmap='viridis', skip=1, alpha=0.5, ax=None):
+    def plot_emission(self, cmap="viridis", skip=1, alpha=0.5, ax=None):
 
         assert self.photon_energies is not None, "There are no photons!"
         cumulative_spectrum = (self._all_spectra.cumsum(axis=0))[::skip]
 
-
-        fig = fill_plot_static(self._emission_kernel.photon_energies, self._emission_kernel.photon_energies ** 2 * cumulative_spectrum, cmap, alpha,
-                                   ax)
-
-
+        fig = fill_plot_static(
+            self._emission_kernel.photon_energies,
+            self._emission_kernel.photon_energies ** 2 * cumulative_spectrum,
+            cmap,
+            alpha,
+            ax,
+        )
 
         if ax is None:
             ax = fig.get_axes()[0]
 
-        ax.set_xscale('log')
-        ax.set_yscale('log')
+        ax.set_xscale("log")
+        ax.set_yscale("log")
 
-        ax.set_xlabel('Energy')
-        ax.set_ylabel(r'$\nu F_{\nu}$')
+        ax.set_xlabel("Energy")
+        ax.set_ylabel(r"$\nu F_{\nu}$")
 
         return fig
 
-    def plot_photons_and_electrons(self, cmap='viridis', skip=1, alpha=0.5):
+    def plot_photons_and_electrons(self, cmap="viridis", skip=1, alpha=0.5):
 
         fig, (ax1, ax2) = plt.subplots(1, 2)
 
@@ -135,10 +135,9 @@ class PhotonEmitter(object):
         ax2.yaxis.tick_right()
         ax2.yaxis.set_label_position("right")
 
-        ax1.set_xlim(left=min(self._gamma_cool, self._gamma_injection) * .5)
+        ax1.set_xlim(left=min(self._gamma_cool, self._gamma_injection) * 0.5)
 
         fig.tight_layout()
         fig.subplots_adjust(hspace=0, wspace=0)
 
         return fig
-

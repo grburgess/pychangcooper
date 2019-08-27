@@ -1,0 +1,14 @@
+language: python
+python:
+  # We don't actually use the Travis Python, but this keeps it organized.
+  - "3.5"
+  - "3.6"
+install:
+  - pip install --upgrade numpy ipython matplotlib numba coverage pytest pytest-cov codecov
+  - python setup.py install
+env:
+  NUMBA_DISABLE_JIT=1
+
+script:
+  - python -m pytest -vv --cov=pychangcooper/
+  - codecov --token=f0e77d6f-9305-493f-a0c3-c3aeed9ad680
