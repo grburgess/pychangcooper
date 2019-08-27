@@ -1,4 +1,21 @@
 import numpy as np
+from numba import jit, njit
+
+
+@njit(fastmath=True)
+def jit_forward_sweep(n, cprime, dprime, a, b, c, d):
+    for i in range(1, n):
+        b_minus_ac = b[i] - a[i] * cprime[i - 1]
+
+        cprime[i] = c[i] / b_minus_ac
+
+        dprime[i] = (d[i] - a[i] * dprime[i - 1]) / b_minus_ac
+
+
+@njit(fastmath=True)
+def jit_backward_sweep(n, n_j_plus_1, cprime, dprime):
+    for j in range(n - 2, -1, -1):
+        n_j_plus_1[j] = dprime[j] - cprime[j] * n_j_plus_1[j + 1]
 
 
 class TridiagonalSolver(object):
@@ -53,19 +70,19 @@ class TridiagonalSolver(object):
         # if we need to forward sweep, we must set the remaining
         # terms. Otherwise, they are just ratios
 
-
-
         self._cprime = self._c / self._b
         self._dprime = d / self._b
 
         if self._a_non_zero:
-
-            for i in range(1, self._n_grid_points):
-                b_minus_ac = self._b[i] - self._a[i] * self._cprime[i - 1]
-
-                self._cprime[i] = self._c[i] / b_minus_ac
-
-                self._dprime[i] = (d[i] - self._a[i] * self._dprime[i - 1]) / b_minus_ac
+            jit_forward_sweep(
+                self._n_grid_points,
+                self._cprime,
+                self._dprime,
+                self._a,
+                self._b,
+                self._c,
+                d,
+            )
 
     def _backwards_substitution(self):
         """
@@ -80,9 +97,7 @@ class TridiagonalSolver(object):
 
         # backwards step to the beginning
 
-        for j in range(self._n_grid_points - 2, -1, -1):
-            n_j_plus_1[
-                j] = self._dprime[j] - self._cprime[j] * n_j_plus_1[j + 1]
+        jit_backward_sweep(self._n_grid_points, n_j_plus_1, self._cprime, self._dprime)
 
         return n_j_plus_1
 
