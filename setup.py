@@ -15,7 +15,7 @@ AUTHOR = "J. Michael Burgess"
 REQUIRES_PYTHON = ">=3.5.0"
 VERSION = None
 
-REQUIRED = ["numpy", "scipy", "ipython", "matplotlib", "numba"]
+REQUIRED = ["numpy", "scipy", "ipython", "matplotlib", "numba", "pygsl"]
 
 # What packages are optional?
 EXTRAS = {
