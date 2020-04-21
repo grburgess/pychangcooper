@@ -1,16 +1,7 @@
 import numpy as np
 
 from pychangcooper.photons.emission_kernel import EmissionKernel
-
-
-try:
-    from pygsl.testing.sf import synchrotron_1
-
-    has_gsl = True
-
-except (ImportError):
-
-    has_gsl = False
+from pychangcooper.photons.synchrotron_kernal import synchrotron_kernel
 
 
 class SynchrotronEmission(EmissionKernel):
@@ -65,7 +56,7 @@ class SynchrotronEmission(EmissionKernel):
             for j, gamma in enumerate(self._gamma_grid):
                 arg = energy / (ec * gamma * gamma)
 
-                self._synchrotron_kernel[i, j] = synchrotron_1(arg)
+                self._synchrotron_kernel[i, j] = synchrotron_kernel(arg)
 
     def compute_spectrum(self, electron_distribution):
         """

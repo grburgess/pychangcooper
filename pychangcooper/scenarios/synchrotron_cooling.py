@@ -183,13 +183,42 @@ class SynchrotronCooling_ContinuousPLInjection(
 
         PhotonEmitter.__init__(self, n_steps, emission_kernel)
 
+    def _clean(self):
 
-# def _clean(self):
+        if self._iterations <= 1:
 
-# #        lower_bound = min(self._gamma_cool, self._gamma_injection)
+            self._idx_max = np.argmax(self._n_current)
+            self._sync_max = self._n_current[self._idx_max]
 
-#         lower_bound = self._gamma_cool
+        # now clean anything below
 
-#         idx = self._grid <= lower_bound
+        idx1 = self._grid < self._gamma_injection
 
-#         self._n_current[idx] = 0.
+        idx2 = self._n_current < self._sync_max
+
+        idx3 = idx1 & idx2
+
+        self._n_current[idx3] = 0.0
+
+        # now handle cooling
+
+        if self._gamma_cool < self._gamma_injection:
+
+            idx = self._grid < self._gamma_cool
+
+            self._n_current[idx] = 0.0
+
+        else:
+
+            idx = self._grid < self._gamma_injection
+
+            self._n_current[idx] = 0.0
+
+        # lower_bound = min(self._gamma_cool, self._gamma_injection)
+
+        # lower_bound = self._gamma_cool
+
+
+#        idx = self._grid <= lower_bound
+
+# self._n_current[:idx] = 0.
