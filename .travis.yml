@@ -1,14 +1,20 @@
 language: python
 python:
-  # We don't actually use the Travis Python, but this keeps it organized.
-  - "3.7"
-  - "3.8"
+- '3.7'
+- '3.8'
 install:
-  - pip install --upgrade pytest pytest-cov codecov
-  - python setup.py install
-env:
-  NUMBA_DISABLE_JIT=1
-
+- pip install --upgrade pytest pytest-cov codecov
+- python setup.py install
+env: NUMBA_DISABLE_JIT=1
 script:
-  - python -m pytest -vv --cov=pychangcooper/
-  - codecov --token=f0e77d6f-9305-493f-a0c3-c3aeed9ad680
+- python -m pytest -vv --cov=pychangcooper/
+- codecov --token=f0e77d6f-9305-493f-a0c3-c3aeed9ad680
+deploy:
+  provider: pypi
+  user: "__token__"
+  password:
+    secure: BoATMPsHefAGc5k9q01EA3rySy2Q+BRZtqsE+pgqL6x3NGq+Bddp45jGGTMB6otvmHMCK7xSPbVjDCEQR2Cpr9X8lFEunnfjSrX+y1Kl/xwDwKl1tWXXltdpUX1d0pTUVdGfpzt9REhMgI60g2vvrVUseXDULRzyik41MoI8/MXm4F4qq4lNpXcjKlAaT5OIuMsYs1tI7zC7rnaT7SE+zXjS0ImOZvyKXVwVYhknZZp4Qu7sdWeT2pdbX/7b34uy+NlCLdT+ylBqdQaJPhqRcLobVEf4RzMja24xY/RIUAfBIH+d/u2zwbfgzw3z3nq0BlX1lzYZ3cz1XBFTGjWXAwQQYqE2o+w8a6r1nEvDt0wHNGGQXgbPmAdx2eUwTHkbHTi1Ve2iMhDXfl2wNIOv/KF/N75m8j3kfM1Lm/aNiRf5Ysvk5/gIuvApFWiaUDi6eWZ5ltdDYIJaAmwAD5PI+CIqnqf/wMjrucOhNnq9CSPOATNg9dFUigPoVEsHJBcSjchDDAmcNGAcPxTJDpAcVawVbhrV4jvvsYdYbpZvKNLs27Oob2PlmaGjfObS6PToY+YicQde9vtCfCSmKXzYpztqFg54bYaDjzg3Q7c3RR0a9UKXmuLIQp3memTdFLly94s9fY8jc3CcaRPzSb6BdlFgXQqpo6NsrJDa9+VE5Oc=
+  on:
+    tags: true
+  distributions: "sdist bdist_wheel" # Your distributions here
+  skip_existing: true
