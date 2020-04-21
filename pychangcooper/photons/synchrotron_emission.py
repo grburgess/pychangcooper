@@ -12,8 +12,6 @@ class SynchrotronEmission(EmissionKernel):
         :param B: the B-field in units of Gauss
         """
 
-        assert has_gsl, "you do not have pygsl"
-
         self._B = B
         self._gamma_grid = gamma_grid
         self._n_grid_points = len(gamma_grid)
