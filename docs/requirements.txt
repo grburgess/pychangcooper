@@ -1,3 +1,11 @@
 sphinx>=1.4
+sphinx-gallery
 nbsphinx
 ipykernel
+jupyterthemes
+numpy
+scipy
+ipython
+matplotlib
+numba
+
