@@ -12,8 +12,8 @@ class SynchrotronEmission(EmissionKernel):
         :param B: the B-field in units of Gauss
         """
 
-        assert has_gsl, 'you do not have pygsl'
-        
+        assert has_gsl, "you do not have pygsl"
+
         self._B = B
         self._gamma_grid = gamma_grid
         self._n_grid_points = len(gamma_grid)
@@ -27,19 +27,7 @@ class SynchrotronEmission(EmissionKernel):
 
         super(SynchrotronEmission, self).set_photon_energies(photon_energies)
 
-        if has_gsl:
-
-            self._build_synchrotron_kernel()
-
-        else:
-
-            # this is a dummy for testing
-
-            self._synchrotron_kernel = np.zeros(
-                (self._n_photon_energies, self._n_grid_points)
-            )
-
-            RuntimeWarning("There is no GSL, cannot compute")
+        self._build_synchrotron_kernel()
 
     def _build_synchrotron_kernel(self):
         """
