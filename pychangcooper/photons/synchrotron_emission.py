@@ -1,16 +1,7 @@
 import numpy as np
 
 from pychangcooper.photons.emission_kernel import EmissionKernel
-
-
-try:
-    from pygsl.testing.sf import synchrotron_1
-
-    has_gsl = True
-
-except (ImportError):
-
-    has_gsl = False
+from pychangcooper.photons.synchrotron_kernal import synchrotron_kernel
 
 
 class SynchrotronEmission(EmissionKernel):
@@ -21,8 +12,6 @@ class SynchrotronEmission(EmissionKernel):
         :param B: the B-field in units of Gauss
         """
 
-        assert has_gsl, 'you do not have pygsl'
-        
         self._B = B
         self._gamma_grid = gamma_grid
         self._n_grid_points = len(gamma_grid)
@@ -36,19 +25,7 @@ class SynchrotronEmission(EmissionKernel):
 
         super(SynchrotronEmission, self).set_photon_energies(photon_energies)
 
-        if has_gsl:
-
-            self._build_synchrotron_kernel()
-
-        else:
-
-            # this is a dummy for testing
-
-            self._synchrotron_kernel = np.zeros(
-                (self._n_photon_energies, self._n_grid_points)
-            )
-
-            RuntimeWarning("There is no GSL, cannot compute")
+        self._build_synchrotron_kernel()
 
     def _build_synchrotron_kernel(self):
         """
@@ -65,7 +42,7 @@ class SynchrotronEmission(EmissionKernel):
             for j, gamma in enumerate(self._gamma_grid):
                 arg = energy / (ec * gamma * gamma)
 
-                self._synchrotron_kernel[i, j] = synchrotron_1(arg)
+                self._synchrotron_kernel[i, j] = synchrotron_kernel(arg)
 
     def compute_spectrum(self, electron_distribution):
         """
