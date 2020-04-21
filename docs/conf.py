@@ -19,6 +19,13 @@
 import os
 import sys
 
+
+
+project = 'pychangcooper'
+copyright = '2018-2020, J. Michael Burgess'
+author = 'J. Michael Burgess'
+
+
 sys.path.insert(0, os.path.abspath('../'))
 
 
