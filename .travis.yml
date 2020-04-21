@@ -1,8 +1,8 @@
 language: python
 python:
   # We don't actually use the Travis Python, but this keeps it organized.
-  - "3.5"
-  - "3.6"
+  - "3.7"
+  - "3.8"
 install:
   - pip install --upgrade pytest pytest-cov codecov
   - python setup.py install
