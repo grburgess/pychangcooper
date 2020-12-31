@@ -23,7 +23,7 @@ jobs:
         shell: bash -l {0}
         run: |
 
-          pip install -U jupyter jupytext
+          pip install jupytext jupyterthemes
           jupytext --to ipynb --pipe black --execute docs/notebooks/*.md
 
       - uses: actions/upload-artifact@v2

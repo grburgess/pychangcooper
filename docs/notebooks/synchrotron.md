@@ -18,7 +18,8 @@ import numpy as np
 
 %matplotlib notebook
 import matplotlib.pyplot as plt
-plt.style.use('ggplot')
+from jupyterthemes import jtplot
+jtplot.style(context='talk', fscale=1.4, spines=False, gridlines='--')
 
 from pychangcooper import SynchrotronCooling_ContinuousPLInjection
 
