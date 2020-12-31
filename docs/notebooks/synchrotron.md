@@ -60,6 +60,3 @@ synch_cool.run(photon_energies=np.logspace(1,7,50))
 synch_cool.plot_photons_and_electrons(skip=20,alpha=.7,cmap='vaporwave');
 ```
 
-```python
-
-```
