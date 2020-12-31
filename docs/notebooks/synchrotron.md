@@ -16,7 +16,7 @@ jupyter:
 ```python
 import numpy as np
 
-%matplotlib notebook
+%matplotlib inline
 import matplotlib.pyplot as plt
 from jupyterthemes import jtplot
 jtplot.style(context='talk', fscale=1.4, spines=False, gridlines='--')

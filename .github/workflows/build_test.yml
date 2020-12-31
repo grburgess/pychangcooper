@@ -19,7 +19,7 @@ jobs:
         github_token: ${{ github.token }}
         concurrent_skipping: never
         skip_after_successful_duplicate: true
-        paths_ignore: '["**/README.md", "**/docs/**"]'
+        paths_ignore: '["**/README.md", "**/docs/**", ".github/workflows/docs.yml"]'
         do_not_skip: '["pull_request",  "schedule"]'
 
   test:
