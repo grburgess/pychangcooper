@@ -23,7 +23,7 @@ class SynchrotronCoolingAccelerationComponent(GenericCoolingAccelerationComponen
         """
         A synchrotron coooling and acceleration component that must be co-inherited with ChangCooper
         to build a full solver
-        
+
         :param B: the magnetic field strength in Gauss
         :param t_acc: the acceleration time scale
         :param acceleration_index: the acceleration index
@@ -55,23 +55,23 @@ class SynchCoolAccel_ImpulsivePLInjection(
     ):
 
         """
-            A synchrotron cooling and acceleration solver and radiation producer with and impulsive
-            injection of power law distributed electrons. The acceleration timescale is taken as a 
-            fraction of the cooling timescale. The acceleration index expresses the turbulence distribution
-            of the magnetic field: 1 for Bohm, 5/3 for Kolmogorov, 2 for Fermi.
-            
-            
-            :param B: the magnetic field strength in Gaussa
-            :param index: the injected electron spectral index
-            :param gamma_injection: the electron injection energy
-            :param gamma_cool: the cooling energy
-            :param gamma_max: the maximum injected energy
-            :param t_acc_fraction: the acceleration time relative to the cooling time
-            :param acceleration_index: the acceleration index
-            :param n_grid_points: number of grid points
-            :param max_grid: the maximum grid energy
-            :param store_progress: to store the progress
-            """
+        A synchrotron cooling and acceleration solver and radiation producer with and impulsive
+        injection of power law distributed electrons. The acceleration timescale is taken as a
+        fraction of the cooling timescale. The acceleration index expresses the turbulence distribution
+        of the magnetic field: 1 for Bohm, 5/3 for Kolmogorov, 2 for Fermi.
+
+
+        :param B: the magnetic field strength in Gaussa
+        :param index: the injected electron spectral index
+        :param gamma_injection: the electron injection energy
+        :param gamma_cool: the cooling energy
+        :param gamma_max: the maximum injected energy
+        :param t_acc_fraction: the acceleration time relative to the cooling time
+        :param acceleration_index: the acceleration index
+        :param n_grid_points: number of grid points
+        :param max_grid: the maximum grid energy
+        :param store_progress: to store the progress
+        """
 
         self._B = B
 
@@ -159,23 +159,23 @@ class SynchCoolAccel_ContinuousPLInjection(
         store_progress=False,
     ):
         """
-            A synchrotron cooling and acceleration solver and radiation producer with continuous
-            injection of power law distributed electrons. The acceleration timescale is taken as a 
-            fraction of the cooling timescale. The acceleration index expresses the turbulence distribution
-            of the magnetic field: 1 for Bohm, 5/3 for Kolmogorov, 2 for Fermi.
+        A synchrotron cooling and acceleration solver and radiation producer with continuous
+        injection of power law distributed electrons. The acceleration timescale is taken as a
+        fraction of the cooling timescale. The acceleration index expresses the turbulence distribution
+        of the magnetic field: 1 for Bohm, 5/3 for Kolmogorov, 2 for Fermi.
 
 
-            :param B: the magnetic field strength in Gaussa
-            :param index: the injected electron spectral index
-            :param gamma_injection: the electron injection energy
-            :param gamma_cool: the cooling energy
-            :param gamma_max: the maximum injected energy
-            :param t_acc_fraction: the acceleration time relative to the cooling time
-            :param acceleration_index: the acceleration index
-            :param n_grid_points: number of grid points
-            :param max_grid: the maximum grid energy
-            :param store_progress: to store the progress
-            """
+        :param B: the magnetic field strength in Gaussa
+        :param index: the injected electron spectral index
+        :param gamma_injection: the electron injection energy
+        :param gamma_cool: the cooling energy
+        :param gamma_max: the maximum injected energy
+        :param t_acc_fraction: the acceleration time relative to the cooling time
+        :param acceleration_index: the acceleration index
+        :param n_grid_points: number of grid points
+        :param max_grid: the maximum grid energy
+        :param store_progress: to store the progress
+        """
 
         self._B = B
 

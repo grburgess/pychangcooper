@@ -1,7 +1,7 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+from tqdm.auto import tqdm, trange
 
-from pychangcooper.utils.progress_bar import progress_bar
 from pychangcooper.io.fill_plot import fill_plot_static
 
 
@@ -9,10 +9,10 @@ class PhotonEmitter(object):
     def __init__(self, n_steps, emission_kernel):
         """FIXME! briefly describe function
 
-        :param n_steps: 
-        :param emission_kernel: 
-        :returns: 
-        :rtype: 
+        :param n_steps:
+        :param emission_kernel:
+        :returns:
+        :rtype:
 
         """
 
@@ -23,38 +23,28 @@ class PhotonEmitter(object):
     def run(self, photon_energies=None):
         """FIXME! briefly describe function
 
-        :param photon_energies: 
-        :returns: 
-        :rtype: 
+        :param photon_energies:
+        :returns:
+        :rtype:
 
         """
 
-        with progress_bar(int(self._n_steps), title="solving electrons electrons") as p:
-            for i in range(int(self._n_steps)):
-                self.solve_time_step()
-
-                p.increase()
+        for i in trange(int(self._n_steps), desc="solving electrons electrons"):
+            self.solve_time_step()
 
         if photon_energies is not None:
 
             self._compute_spectrum(photon_energies)
 
     def _compute_spectrum(self, photon_energies):
-        """
-
-        """
+        """"""
 
         self._emission_kernel.set_photon_energies(photon_energies)
 
         self._all_spectra = []
 
-        with progress_bar(int(self._n_steps), title="computing spectrum") as p:
-            for electrons in self.history:
-                self._all_spectra.append(
-                    self._emission_kernel.compute_spectrum(electrons)
-                )
-
-                p.increase()
+        for electrons in tqdm(self.history, desc="computing spectrum"):
+            self._all_spectra.append(self._emission_kernel.compute_spectrum(electrons))
 
         self._all_spectra = np.array(self._all_spectra)
 
@@ -73,11 +63,11 @@ class PhotonEmitter(object):
     def plot_final_emission(self, ax=None, x_scaling=1.0, y_scaling=1.0, **kwargs):
         """FIXME! briefly describe function
 
-        :param ax: 
-        :param x_scaling: 
-        :param y_scaling: 
-        :returns: 
-        :rtype: 
+        :param ax:
+        :param x_scaling:
+        :param y_scaling:
+        :returns:
+        :rtype:
 
         """
 
@@ -105,9 +95,9 @@ class PhotonEmitter(object):
     def plot_initial_emission(self, ax=None, **kwargs):
         """FIXME! briefly describe function
 
-        :param ax: 
-        :returns: 
-        :rtype: 
+        :param ax:
+        :returns:
+        :rtype:
 
         """
 
@@ -136,12 +126,12 @@ class PhotonEmitter(object):
     def plot_emission(self, cmap="viridis", skip=1, alpha=0.5, ax=None):
         """FIXME! briefly describe function
 
-        :param cmap: 
-        :param skip: 
-        :param alpha: 
-        :param ax: 
-        :returns: 
-        :rtype: 
+        :param cmap:
+        :param skip:
+        :param alpha:
+        :param ax:
+        :returns:
+        :rtype:
 
         """
 
@@ -170,11 +160,11 @@ class PhotonEmitter(object):
     def plot_photons_and_electrons(self, cmap="viridis", skip=1, alpha=0.5):
         """FIXME! briefly describe function
 
-        :param cmap: 
-        :param skip: 
-        :param alpha: 
-        :returns: 
-        :rtype: 
+        :param cmap:
+        :param skip:
+        :param alpha:
+        :returns:
+        :rtype:
 
         """
 

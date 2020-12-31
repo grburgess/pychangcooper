@@ -7,11 +7,11 @@ class GenericCoolingAccelerationComponent(object):
     def __init__(self, C0=1.0, t_acc=1, cooling_index=-2, acceleration_index=2):
 
         """
-        Generic cooling and acceleration component that must be co-inherited with 
+        Generic cooling and acceleration component that must be co-inherited with
         ChangCooper to form a complete solution. This is to reduce code duplication
         for similar problems
-        
-        
+
+
         :param C0: the cooling constant
         :param t_acc: the acceleration time
         :param cooling_index: the cooling index
@@ -37,7 +37,7 @@ class GenericCoolingAccelerationComponent(object):
         """
         calculate the cooling time of a particle with energy gamma
         :param gamma: the energy of the particle
-        :return: 
+        :return:
         """
         return 1.0 / (self._C0 * gamma)
 
@@ -69,10 +69,10 @@ class CoolingAcceleration(GenericCoolingAccelerationComponent, ChangCooper):
         initial_distribution=None,
     ):
         """
-        Cooling and acceleration of an unspecified form. 
-        
-        
-        :param n_grid_points: number of grid points 
+        Cooling and acceleration of an unspecified form.
+
+
+        :param n_grid_points: number of grid points
         :param C0: the cooling constant
         :param t_acc: the acceleration time
         :param cooling_index: the index of the cooling term

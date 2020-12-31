@@ -6,7 +6,7 @@ class GenericCoolingComponent(object):
         """
         A generic cooling component that must be co-inherited with
         ChangCooper to produce a cooling only solution
-        
+
         :param C0: the cooling constant
         :param cooling_index: the cooling index
         """

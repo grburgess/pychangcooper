@@ -101,13 +101,13 @@ def cheb_eval(coeff, order, a, b, x):
     """
     evaluate the cheb poly for the given value of x
 
-    :param coeff: 
-    :param order: 
-    :param a: 
-    :param b: 
-    :param x: 
-    :returns: 
-    :rtype: 
+    :param coeff:
+    :param order:
+    :param a:
+    :param b:
+    :param x:
+    :returns:
+    :rtype:
 
     """
     d = 0.0
@@ -132,9 +132,9 @@ def synchrotron_kernel(x):
     """
     synchrotron kernel
 
-    :param x: 
-    :returns: 
-    :rtype: 
+    :param x:
+    :returns:
+    :rtype:
 
     """
 
