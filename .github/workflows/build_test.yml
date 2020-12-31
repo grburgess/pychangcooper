@@ -7,8 +7,25 @@ on:
     - cron: 0 0 * * *
 
 jobs:
-  build:
 
+  skip_duplicate:
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+    - id: skip_check
+      uses: fkirc/skip-duplicate-actions@master
+      with:
+        github_token: ${{ github.token }}
+        concurrent_skipping: never
+        skip_after_successful_duplicate: true
+        paths_ignore: '["**/README.md", "**/docs/**"]'
+        do_not_skip: '["pull_request",  "schedule"]'
+
+  test:
+    name: Run Tests
+    needs: skip_duplicate
+    if: ${{ needs.skip_duplicate.outputs.should_skip == 'false' }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -24,8 +41,10 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -U pip
-        pip install --upgrade flake8 coverage pytest pytest-cov codecov
+        pip install --upgrade flake8 coverage pytest pytest-cov  codecov
+        
         python setup.py install
+        
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -67,7 +86,7 @@ jobs:
 
 
   publish:
-    needs: build
+#    needs: test
     runs-on: ubuntu-latest
     name: Publish package
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
@@ -76,9 +95,12 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: 3.8
-
+    - name: Run sdist
+      run: |
+        python setup.py sdist
     - uses: pypa/gh-action-pypi-publish@master
       with:
         user: __token__
         password: ${{ secrets.PYPI_UPLOAD_TOKEN }}
         skip_existing: true
+
