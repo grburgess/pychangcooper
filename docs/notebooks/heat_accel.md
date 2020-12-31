@@ -20,7 +20,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 
-from pychangcooper import  GenericCoolingAcceleration
+from pychangcooper import  CoolingAcceleration
 
 ```
 

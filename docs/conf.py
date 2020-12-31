@@ -231,7 +231,7 @@ texinfo_documents = [
 ]
 
 
-ef setup(app):
+def setup(app):
     app.connect("builder-inited", run_apidoc)
 
 
