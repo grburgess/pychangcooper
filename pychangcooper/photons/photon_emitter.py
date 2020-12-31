@@ -163,7 +163,7 @@ class PhotonEmitter(object):
         ax.set_yscale("log")
 
         ax.set_xlabel("Energy")
-        ax.set_ylabel(r"$\nu F_{\nu}$")
+        ax.set_ylabel(r"vFv")
 
         return fig
 
