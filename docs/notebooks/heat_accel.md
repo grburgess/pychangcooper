@@ -68,7 +68,7 @@ We set $C_0 = 1$ and $t_{\text{acc}} = 10^{-4}$ and thus $\gamma_{\text{e}} = 10
 
 
 ```python
-generic_ca = GenericCoolingAcceleration(n_grid_points=n_grid_points,
+generic_ca = CoolingAcceleration(n_grid_points=n_grid_points,
                                         C0 = 1.,
                                         t_acc= 1E-4,
                                         cooling_index=2.,
