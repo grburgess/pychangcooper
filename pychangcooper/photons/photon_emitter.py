@@ -7,12 +7,27 @@ from pychangcooper.io.fill_plot import fill_plot_static
 
 class PhotonEmitter(object):
     def __init__(self, n_steps, emission_kernel):
+        """FIXME! briefly describe function
+
+        :param n_steps: 
+        :param emission_kernel: 
+        :returns: 
+        :rtype: 
+
+        """
 
         self._n_steps = n_steps
 
         self._emission_kernel = emission_kernel
 
     def run(self, photon_energies=None):
+        """FIXME! briefly describe function
+
+        :param photon_energies: 
+        :returns: 
+        :rtype: 
+
+        """
 
         with progress_bar(int(self._n_steps), title="solving electrons electrons") as p:
             for i in range(int(self._n_steps)):
@@ -56,6 +71,15 @@ class PhotonEmitter(object):
         return self._emission_kernel.photon_energies
 
     def plot_final_emission(self, ax=None, x_scaling=1.0, y_scaling=1.0, **kwargs):
+        """FIXME! briefly describe function
+
+        :param ax: 
+        :param x_scaling: 
+        :param y_scaling: 
+        :returns: 
+        :rtype: 
+
+        """
 
         assert self.photon_energies is not None, "There are no photons!"
 
@@ -74,11 +98,18 @@ class PhotonEmitter(object):
         )
 
         ax.set_xlabel("Energy")
-        ax.set_ylabel(r"$\nu F_{\nu}$")
+        ax.set_ylabel(r"$vFv$")
 
         return fig
 
     def plot_initial_emission(self, ax=None, **kwargs):
+        """FIXME! briefly describe function
+
+        :param ax: 
+        :returns: 
+        :rtype: 
+
+        """
 
         assert self.photon_energies is not None, "There are no photons!"
         assert np.all(self._all_spectra[0] > 0.0), "There are no photons to start!"
@@ -98,11 +129,21 @@ class PhotonEmitter(object):
         )
 
         ax.set_xlabel("Energy")
-        ax.set_ylabel(r"$\nu F_{\nu}$")
+        ax.set_ylabel(r"vFv")
 
         return fig
 
     def plot_emission(self, cmap="viridis", skip=1, alpha=0.5, ax=None):
+        """FIXME! briefly describe function
+
+        :param cmap: 
+        :param skip: 
+        :param alpha: 
+        :param ax: 
+        :returns: 
+        :rtype: 
+
+        """
 
         assert self.photon_energies is not None, "There are no photons!"
         cumulative_spectrum = (self._all_spectra.cumsum(axis=0))[::skip]
@@ -122,11 +163,20 @@ class PhotonEmitter(object):
         ax.set_yscale("log")
 
         ax.set_xlabel("Energy")
-        ax.set_ylabel(r"$\nu F_{\nu}$")
+        ax.set_ylabel(r"vFv")
 
         return fig
 
     def plot_photons_and_electrons(self, cmap="viridis", skip=1, alpha=0.5):
+        """FIXME! briefly describe function
+
+        :param cmap: 
+        :param skip: 
+        :param alpha: 
+        :returns: 
+        :rtype: 
+
+        """
 
         fig, (ax1, ax2) = plt.subplots(1, 2)
 
