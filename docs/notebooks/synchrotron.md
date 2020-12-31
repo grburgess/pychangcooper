@@ -8,9 +8,9 @@ jupyter:
       format_version: '1.2'
       jupytext_version: 1.8.0
   kernelspec:
-    display_name: pychangcooper
+    display_name: Python 3
     language: python
-    name: pychangcooper
+    name: python3
 ---
 
 ```python
@@ -18,7 +18,7 @@ import numpy as np
 
 %matplotlib notebook
 import matplotlib.pyplot as plt
-plt.style.use('mike')
+plt.style.use('ggplot')
 
 from pychangcooper import SynchrotronCooling_ContinuousPLInjection
 
