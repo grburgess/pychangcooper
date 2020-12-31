@@ -36,7 +36,7 @@ class ChangCooper(object):
         store_progress=False,
     ):
         """
-        Generic Chang and Cooper base class. Currently, the dispersion and heating terms 
+        Generic Chang and Cooper base class. Currently, the dispersion and heating terms
         are assumed to be time-independent
 
         :param n_grid_points: number of grid points on the x-axis
@@ -88,7 +88,7 @@ class ChangCooper(object):
 
     def _build_grid(self):
         """
-        setup the grid for the calculations and initialize the 
+        setup the grid for the calculations and initialize the
         solution
         """
 
@@ -160,7 +160,7 @@ class ChangCooper(object):
     def _setup_vectors(self):
         """
         from the specified terms in the subclasses, setup the tridiagonal terms
-        
+
         """
 
         # initialize everything to zero
@@ -318,7 +318,7 @@ class ChangCooper(object):
 
     def _compute_source_function_and_escape(self):
         """
-        compute the grid of the source term. This will just be zero if there is nothing 
+        compute the grid of the source term. This will just be zero if there is nothing
         added and all will be zero
         """
 
@@ -339,7 +339,7 @@ class ChangCooper(object):
 
     def solve_time_step(self):
         """
-        Solve for the next time step. 
+        Solve for the next time step.
         """
 
         # if we are storing the solutions, then append them
@@ -403,7 +403,7 @@ class ChangCooper(object):
     @property
     def delta_j(self):
         """
-        the delta_js 
+        the delta_js
         """
 
         return self._delta_j
@@ -443,8 +443,8 @@ class ChangCooper(object):
     def reset(self):
         """
         reset the solver to the initial electron distribution
-        
-        :return: 
+
+        :return:
         """
 
         self._n_current = self._initial_distribution
@@ -474,7 +474,7 @@ class ChangCooper(object):
     def plot_initial_distribution(self, ax=None, **kwargs):
         """
         plot the initial distribution of the electrons
-        
+
         :param ax: ax to plot to
         :param kwargs: mpl kwargs
         :return: fig
@@ -510,16 +510,16 @@ class ChangCooper(object):
     ):
         """
         plot th evolution of the electrons
-        
-        
+
+
         :param cmap: cmap to use
         :param skip: number of elements to skip
         :param show_legend: show a legend
-        :param alpha: the transparency 
+        :param alpha: the transparency
         :param show_final: label the final solution
         :param show_initial: show the initial distribution
         :param ax: the ax to plot to
-        :return: 
+        :return:
         """
 
         solutions = self.history[::skip]

@@ -17,9 +17,9 @@ class SynchrotronCoolingComponent(GenericCoolingComponent):
     def __init__(self, B):
         """
         A synchrotron cooling component that implements the proper cooling terms
-        
+
         :param B: magnetic field strength in Gauss
-        
+
         """
 
         C0 = synchrotron_cooling_constant(B)
@@ -43,7 +43,7 @@ class SynchrotronCooling_ImpulsivePLInjection(
     ):
         """
         Synchrotron cooling and radiation from an impulsive power law injection of particles.
-        
+
         :param B: the magnetic field strength in Gaussa
         :param index: the injected electron spectral index
         :param gamma_injection: the electron injection energy
@@ -127,7 +127,7 @@ class SynchrotronCooling_ContinuousPLInjection(
     ):
         """
         Synchrotron cooling and radiation from continuous power law injection of particles.
-        
+
         :param B: the magnetic field strength in Gaussa
         :param index: the injected electron spectral index
         :param gamma_injection: the electron injection energy

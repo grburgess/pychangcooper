@@ -6,13 +6,13 @@ from pychangcooper.utils.cmap_intervals import cmap_intervals
 
 def fill_plot_static(x, y_values, cmap="viridis", alpha=1.0, ax=None):
     """
-    
-    plot all the y values 
-    
-    :param x: the x values 
+
+    plot all the y values
+
+    :param x: the x values
     :param y_values: the matrix of y values
     :param cmap: mpl cmap
-    :param alpha: the transparency 
+    :param alpha: the transparency
     :param ax: optional ax
     :return: mpl figure
     """
@@ -49,7 +49,7 @@ def fill_plot_static(x, y_values, cmap="viridis", alpha=1.0, ax=None):
 def plot_time_step(iteration, x, y_values, color, zorder, alpha, ax):
     """
     plot an individual time step with a filled plot
-    
+
     :param iteration: the iteration to consider
     :param x: the x values
     :param y_values: the matrix of y vaules

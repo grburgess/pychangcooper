@@ -87,7 +87,7 @@ class TridiagonalSolver(object):
     def _backwards_substitution(self):
         """
         This is the backwards substitution step of the tridiagonal
-        solver. 
+        solver.
         """
 
         n_j_plus_1 = np.zeros(self._n_grid_points)
@@ -102,9 +102,7 @@ class TridiagonalSolver(object):
         return n_j_plus_1
 
     def solve(self, d_j):
-        """
-        
-        """
+        """"""
 
         self._forward_sweep(d_j)
 

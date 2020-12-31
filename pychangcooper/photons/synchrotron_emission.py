@@ -46,9 +46,9 @@ class SynchrotronEmission(EmissionKernel):
 
     def compute_spectrum(self, electron_distribution):
         """
-        
+
         :param electron_distribution: the electron distribution to convolve
-        :return: 
+        :return:
         """
 
         spectrum = np.zeros_like(self._photon_energies)

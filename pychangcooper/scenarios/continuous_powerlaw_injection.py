@@ -16,7 +16,7 @@ class ContinuousPowerlawInjection(object):
     def _source_function(self, x):
         """
         power law injection
-        
+
         """
 
         out = np.zeros(self._n_grid_points)
