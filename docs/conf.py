@@ -16,17 +16,47 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import os
-import sys
-
-
 
 project = 'pychangcooper'
 copyright = '2018-2020, J. Michael Burgess'
 author = 'J. Michael Burgess'
 
 
+import os
+import sys
+
+
+
+
+
+
+from pathlib import Path
+
+import sphinx_rtd_theme
+
 sys.path.insert(0, os.path.abspath('../'))
+
+DOCS = Path(__file__).parent
+
+# -- Generate API documentation ------------------------------------------------
+def run_apidoc(app):
+    """Generage API documentation"""
+    import better_apidoc
+
+    better_apidoc.APP = app
+    better_apidoc.main(
+        [
+            "better-apidoc",
+            # "-t",
+            # str(docs / "_templates"),
+            "--force",
+            "--no-toc",
+            "--separate",
+            "-o",
+            str(DOCS / "API"),
+            str(DOCS / ".." / "pychangcooper" ),
+        ]
+    )
 
 
 # -- General configuration ------------------------------------------------
@@ -43,14 +73,38 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
-    'sphinx.ext.napoleon'
+    'sphinx.ext.napoleon',
+    'rtds_action'
 ]
+
+
+
+napoleon_google_docstring = True
+napoleon_use_param = False
 
 
 html_show_sourcelink = False
 # html_favicon = "media/favicon.ico"
 
 html_show_sphinx = False
+
+
+
+# The name of your GitHub repository
+rtds_action_github_repo = "grburgess/pychangcooper"
+
+
+# The path where the artifact should be extracted
+# Note: this is relative to the conf.py file!
+rtds_action_path = "notebooks"
+
+# The "prefix" used in the `upload-artifact` step of the action
+rtds_action_artifact_prefix = "notebooks-for-"
+
+# A GitHub personal access token is required, more info below
+rtds_action_github_token = os.environ["GITHUB_TOKEN"]
+
+
 
 
 # These paths are either relative to html_static_path
@@ -85,15 +139,11 @@ nbsphinx_execute_arguments = [
 # autoclass_content = 'both'
 
 
-# edit_on_github_project = 'JohannesBuchner/UltraNest'
-# edit_on_github_branch = 'master'
-# #edit_on_github_url
-# edit_on_github_src = 'docs/'  # optional. default: ''
 
 
 
 html_theme_options = {
- #   'canonical_url': 'https://johannesbuchner.github.io/UltraNest/',
+
     'style_external_links': True,
     # 'vcs_pageview_mode': 'edit',
     'style_nav_header_background': '#0B0D10',
@@ -180,5 +230,8 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
+
+ef setup(app):
+    app.connect("builder-inited", run_apidoc)
 
 
